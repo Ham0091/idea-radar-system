@@ -1,0 +1,1 @@
+Extract the most relevant market or product signals from the input source.
