@@ -4,11 +4,13 @@ from typing import Any, Dict, List, Optional
 
 @dataclass
 class RawSignal:
-    source_id: str
-    source_type: str
     text: str
     url: Optional[str]
     timestamp: str
+    hash: str = ""
+    source: str = ""
+    source_id: Optional[str] = None
+    source_type: Optional[str] = None
     metrics: Dict[str, Any] = field(default_factory=dict)
 
 

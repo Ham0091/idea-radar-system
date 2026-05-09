@@ -8,6 +8,8 @@ from pathlib import Path
 from typing import Any, Optional
 from zoneinfo import ZoneInfo
 
+logger = logging.getLogger("utils")
+
 
 def load_env_file(base_dir: Path) -> None:
     env_path = base_dir / ".env"
@@ -39,6 +41,10 @@ def parse_iso(value: Optional[str]) -> Optional[datetime]:
         return datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         return None
+
+
+# Alias used by scorer.py and other modules
+parse_datetime = parse_iso
 
 
 def format_display_date(iso_value: Optional[str], tz_name: str) -> str:
@@ -97,19 +103,30 @@ def hash_text(text: str) -> str:
 
 
 def safe_json_loads(text: str) -> Any:
+    raw_text = text or ""
+    cleaned = raw_text.strip()
+    if cleaned.startswith("```"):
+        cleaned = re.sub(r"^```[a-zA-Z]*\s*", "", cleaned)
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+        cleaned = cleaned.strip()
+
+    candidate = cleaned
+    if "[" in cleaned and "]" in cleaned:
+        start = cleaned.find("[")
+        end = cleaned.rfind("]")
+        if start != -1 and end != -1 and end > start:
+            candidate = cleaned[start : end + 1]
+    elif "{" in cleaned and "}" in cleaned:
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            candidate = cleaned[start : end + 1]
+
     try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        for left, right in [("[", "]"), ("{", "}")]:
-            start = text.find(left)
-            end = text.rfind(right)
-            if start != -1 and end != -1 and end > start:
-                snippet = text[start : end + 1]
-                try:
-                    return json.loads(snippet)
-                except json.JSONDecodeError:
-                    continue
-        raise
+        return json.loads(candidate)
+    except Exception as exc:
+        logger.warning("Failed to parse LLM JSON: %s", raw_text[:500])
+        raise ValueError(f"Failed to parse LLM JSON: {raw_text[:300]}") from exc
 
 
 def json_dumps(value: Any) -> str:

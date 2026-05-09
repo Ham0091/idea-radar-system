@@ -1,4 +1,5 @@
 import json
+import os
 import time
 from typing import Any, Dict, List, Tuple
 
@@ -17,13 +18,16 @@ class LLMClient:
             raise ValueError("Missing LLM API key")
         self.api_key = api_key
         self.logger = logger
+        self.base_url = config.LLM_BASE_URL
+        self.model = config.LLM_MODEL
 
     def _post(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        url = config.LLM_BASE_URL.rstrip("/") + "/chat/completions"
+        url = f"{self.base_url.rstrip('/')}/chat/completions"
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
+        self.logger.info("LLM request → %s using model %s", self.base_url, self.model)
         response = requests.post(
             url,
             headers=headers,
@@ -36,10 +40,11 @@ class LLMClient:
 
     def call_json(self, prompt: str, payload: Any) -> Tuple[Any, Dict[str, Any]]:
         message = f"{prompt}\n\nINPUT:\n{json.dumps(payload, ensure_ascii=True)}"
+        messages = [{"role": "user", "content": message}]
         request_body = {
-            "model": config.LLM_MODEL,
-            "messages": [{"role": "user", "content": message}],
-            "temperature": config.LLM_TEMPERATURE,
+            "model": self.model,
+            "messages": messages,
+            "temperature": 0.2,
         }
 
         retries = config.LLM_MAX_RETRIES
@@ -49,6 +54,7 @@ class LLMClient:
             try:
                 response = self._post(request_body)
                 content = response["choices"][0]["message"]["content"]
+                self.logger.info("Raw LLM response: %s", content)
                 return safe_json_loads(content), response.get("usage", {})
             except Exception as exc:
                 if attempt >= retries:
@@ -253,9 +259,9 @@ def create_ideas(
                 tags=[str(tag).lower() for tag in tags if str(tag).strip()],
                 why_now=str(why_now).strip(),
                 keywords=[str(k).lower() for k in keywords if str(k).strip()],
-                initial_pain=float(initial_pain),
-                initial_novelty=float(initial_novelty),
-                initial_buildability=float(initial_buildability),
+                initial_pain=float(max(0.0, min(10.0, initial_pain))),
+                initial_novelty=float(max(0.0, min(10.0, initial_novelty))),
+                initial_buildability=float(max(0.0, min(10.0, initial_buildability))),
             )
         )
 

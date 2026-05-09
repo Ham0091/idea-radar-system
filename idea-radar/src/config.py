@@ -13,10 +13,11 @@ DISPLAY_TZ = os.environ.get("DISPLAY_TZ", "UTC")
 PROMPT_VERSION = "v3"
 
 SOURCE_TIMEOUT_SECONDS = 15
+SOURCE_FAILURE_LIMIT = 3
 
-LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "https://api.openai.com/v1")
-LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4o-mini")
-LLM_API_KEY_ENV = "OPENAI_API_KEY"
+LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "https://token-plan-sgp.xiaomimimo.com/v1")
+LLM_MODEL = os.environ.get("LLM_MODEL", "mimo-v2-5-pro")
+LLM_API_KEY_ENV = "LLM_API_KEY"
 LLM_TIMEOUT_SECONDS = 60
 LLM_MAX_RETRIES = 2
 LLM_RETRY_BACKOFF_SECONDS = [10, 30]
@@ -34,6 +35,7 @@ REDDIT_TIME_FILTER = "day"
 
 HN_CAP = 25
 HN_MIN_SCORE = 5
+HN_QUERY = ""
 
 ENABLE_GITHUB_TRENDING = True
 GITHUB_TRENDING_CAP = 25

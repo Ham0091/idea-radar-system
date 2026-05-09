@@ -171,11 +171,15 @@ def refresh_saturation(
             logger.warning("Rate limit hit during saturation refresh")
             break
 
-        response.raise_for_status()
-        data = response.json()
-        total = int(data.get("total_count", 0))
-        saturation = min(total, config.SATURATION_CAP_REPOS) / 10.0
-        updates[idea.id] = (saturation, now_iso)
+        try:
+            response.raise_for_status()
+            data = response.json()
+            total = int(data.get("total_count", 0))
+            saturation = min(total, config.SATURATION_CAP_REPOS) / 10.0
+            updates[idea.id] = (saturation, now_iso)
+        except Exception as exc:
+            logger.warning("Saturation refresh failed for idea %s: %s", idea.id, exc)
+
         time.sleep(config.SATURATION_REQUEST_SLEEP_SECONDS)
 
     return updates

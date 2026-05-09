@@ -3,7 +3,16 @@ import re
 import time
 from typing import List, Tuple
 
-import feedparser
+try:
+    import feedparser
+except ImportError:
+    feedparser = None
+
+try:
+    import praw
+except ImportError:
+    praw = None
+
 import requests
 
 import config
@@ -167,9 +176,7 @@ def _fetch_reddit(subreddit: str) -> List[RawSignal]:
 
 
 def _get_praw_client():
-    try:
-        import praw
-    except ImportError:
+    if praw is None:
         return None
 
     client_id = os.environ.get("REDDIT_CLIENT_ID")
@@ -316,6 +323,8 @@ def _fetch_stack_overflow() -> List[RawSignal]:
 
 
 def _fetch_indiehackers() -> List[RawSignal]:
+    if feedparser is None:
+        raise RuntimeError("feedparser not installed. Run: pip install feedparser")
     signals: List[RawSignal] = []
     for url in config.IH_FEEDS:
         feed = feedparser.parse(url)
@@ -338,6 +347,8 @@ def _fetch_indiehackers() -> List[RawSignal]:
 
 
 def _fetch_rss(url: str, source_id: str) -> List[RawSignal]:
+    if feedparser is None:
+        raise RuntimeError("feedparser not installed. Run: pip install feedparser")
     feed = feedparser.parse(url)
     signals: List[RawSignal] = []
     for entry in feed.entries[: config.RSS_CAP]:

@@ -80,7 +80,7 @@ def run_pipeline(logger) -> int:
             seen_hashes = set(storage.fetch_seen_hashes(conn))
             source_configs = storage.fetch_source_configs(conn)
 
-        prev_top10_ids = extract_prev_top10(last_run)
+        prev_top10_ids, prev_scores = extract_prev_top10(last_run)
         enabled_source_ids = build_enabled_sources(source_configs)
 
         signals, source_results = collector.collect_all_sources(enabled_source_ids, logger)
@@ -266,7 +266,7 @@ def run_pipeline(logger) -> int:
         top10_ids = [idea.id for idea in top10]
         archive_ids = scorer.select_archives(all_ideas, top10_ids, now)
 
-        top10_changes = build_top10_changes(prev_top10_ids, top10_ids)
+        top10_changes = build_top10_changes(prev_top10_ids, top10_ids, top10)
 
         run_log_payload = {
             "run_id": run_id,
@@ -334,10 +334,10 @@ def run_pipeline(logger) -> int:
         prev_failed = bool(last_run and last_run.get("digest_sent") == 0)
         digest_text = digest.format_digest(
             now_iso,
-            build_top10_display(top10, prev_top10_ids),
+            build_top10_display(top10, prev_top10_ids, prev_scores),
             prev_failed,
             new_ideas,
-            build_movers(prev_top10_ids, top10_ids),
+            build_movers(prev_top10_ids, top10_ids, ideas_by_id),
             source_results,
             digest_stats,
         )
@@ -366,25 +366,34 @@ def build_enabled_sources(source_configs: dict) -> set[str]:
     return enabled
 
 
-def extract_prev_top10(last_run: dict) -> list[str]:
+def extract_prev_top10(last_run: dict) -> tuple[list[str], dict[str, float]]:
     if not last_run or not last_run.get("top10_changes"):
-        return []
+        return [], {}
     try:
         data = json.loads(last_run.get("top10_changes"))
-        return data.get("current_top10", [])
+        top10_data = data.get("current_top10", [])
+        if top10_data and isinstance(top10_data[0], dict):
+            ids = [entry["id"] for entry in top10_data]
+            scores = {entry["id"]: entry.get("score", 0.0) for entry in top10_data}
+            return ids, scores
+        # Backward compatibility: old format was a plain list of IDs
+        return top10_data if isinstance(top10_data, list) else [], {}
     except Exception:
-        return []
+        return [], {}
 
 
-def build_top10_changes(prev: list[str], current: list[str]) -> dict:
+def build_top10_changes(prev: list[str], current: list[str], top10: list[IdeaRecord]) -> dict:
     return {
         "entries": [idea_id for idea_id in current if idea_id not in prev],
         "exits": [idea_id for idea_id in prev if idea_id not in current],
-        "current_top10": current,
+        "current_top10": [
+            {"id": idea.id, "score": round(scorer.ranking_score(idea), 2)}
+            for idea in top10
+        ],
     }
 
 
-def build_movers(prev: list[str], current: list[str]) -> list[str]:
+def build_movers(prev: list[str], current: list[str], ideas_by_id: dict[str, IdeaRecord]) -> list[str]:
     prev_rank = {idea_id: idx + 1 for idx, idea_id in enumerate(prev)}
     movers = []
     for idx, idea_id in enumerate(current):
@@ -395,24 +404,29 @@ def build_movers(prev: list[str], current: list[str]) -> list[str]:
         if old_rank == rank:
             continue
         direction = "UP" if rank < old_rank else "DOWN"
-        movers.append(f"{direction} {old_rank} -> {rank}: {idea_id}")
+        title = ideas_by_id[idea_id].title if idea_id in ideas_by_id else idea_id
+        movers.append(f"{direction} #{old_rank} -> #{rank}: {title}")
     return movers
 
 
-def build_top10_display(top10: list[IdeaRecord], prev: list[str]) -> list[dict]:
+def build_top10_display(
+    top10: list[IdeaRecord], prev: list[str], prev_scores: dict[str, float]
+) -> list[dict]:
     prev_rank = {idea_id: idx + 1 for idx, idea_id in enumerate(prev)}
     items = []
     for idx, idea in enumerate(top10):
         rank = idx + 1
         prev_rank_value = prev_rank.get(idea.id)
         score = scorer.ranking_score(idea)
+        prev_score = prev_scores.get(idea.id)
+        score_delta = round(score - prev_score, 1) if prev_score is not None else None
         items.append(
             {
                 "idea": idea,
                 "rank": rank,
                 "prev_rank": prev_rank_value,
                 "score": score,
-                "score_delta": None,
+                "score_delta": score_delta,
             }
         )
     return items
