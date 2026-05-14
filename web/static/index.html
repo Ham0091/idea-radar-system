@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d10">
+  <meta name="description" content="Idea Radar System — personal intelligence interface for discovering and ranking opportunities.">
+  <meta property="og:title" content="Idea Radar System">
+  <meta property="og:description" content="A personal intelligence system that shapes what you notice.">
+  <meta property="og:type" content="website">
+  <title>Idea Radar System</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0d10'/%3E%3Ctext x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3ff' font-family='monospace' font-size='28'%3EIR%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/design-system.css">
+  <link rel="stylesheet" href="/static/css/layout.css">
+  <link rel="stylesheet" href="/static/css/components.css">
+  <link rel="stylesheet" href="/static/css/motion.css">
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Skip to content</a>
+
+  <div id="app" data-tier="standard">
+    <div class="ambient-layer ambient-base" aria-hidden="true"></div>
+    <div class="ambient-layer ambient-drift" aria-hidden="true"></div>
+    <div class="ambient-layer ambient-grain" aria-hidden="true"></div>
+
+    <header class="top-bar">
+      <div class="top-bar-row">
+        <button class="app-mark" id="appMark" type="button" aria-label="Go to Radar">IRS</button>
+        <button class="profile-chip" id="profileChip" type="button" aria-haspopup="dialog" aria-controls="settingsSheet" aria-label="Open settings">
+          IR
+        </button>
+      </div>
+      <div class="time-rhythm" aria-hidden="true">
+        <div class="time-rhythm-fill" id="timeRhythmFill"></div>
+      </div>
+    </header>
+
+    <main class="main-shell" id="mainContent" tabindex="-1">
+      <section class="view is-active" id="viewRadar" data-view="radar" aria-label="Radar"></section>
+      <section class="view" id="viewMovers" data-view="movers" aria-label="Movers"></section>
+      <section class="view" id="viewExplore" data-view="explore" aria-label="Explore"></section>
+      <section class="view view-system" id="viewSystem" data-view="system" aria-label="System"></section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Primary navigation">
+      <button class="nav-item is-active" type="button" data-nav="radar" aria-label="Radar">
+        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
+          <path d="M12 4a8 8 0 1 0 8 8M12 8a4 4 0 1 1-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span class="nav-label">Radar</span>
+        <span class="nav-dot" aria-hidden="true"></span>
+      </button>
+      <button class="nav-item" type="button" data-nav="movers" aria-label="Movers">
+        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
+          <path d="M4 17h4l3-5 3 3 6-9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span class="nav-label">Movers</span>
+        <span class="nav-dot" aria-hidden="true"></span>
+      </button>
+      <button class="nav-item" type="button" data-nav="explore" aria-label="Explore">
+        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
+          <path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm9 16-4.2-4.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span class="nav-label">Explore</span>
+        <span class="nav-dot" aria-hidden="true"></span>
+      </button>
+      <button class="nav-item" type="button" data-nav="system" aria-label="System">
+        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
+          <path d="M12 3v4m0 10v4M4.2 7l3.4 2m8.8 6 3.4 2M3 12h4m10 0h4M4.2 17l3.4-2m8.8-6 3.4-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+        <span class="nav-label">System</span>
+        <span class="nav-dot" aria-hidden="true"></span>
+      </button>
+    </nav>
+
+    <div class="scrim" id="globalScrim" hidden></div>
+
+    <aside class="inspect-panel" id="inspectPanel" aria-hidden="true" aria-label="Inspect opportunity">
+      <div class="inspect-handle" aria-hidden="true"></div>
+      <div class="scanline-pass" id="inspectScanline" aria-hidden="true"></div>
+      <div class="inspect-inner" id="inspectInner"></div>
+    </aside>
+
+    <section class="sheet" id="settingsSheet" aria-hidden="true" aria-label="Settings"></section>
+    <section class="sheet" id="sortSheet" aria-hidden="true" aria-label="Sort options"></section>
+    <section class="sheet sheet-search" id="searchSheet" aria-hidden="true" aria-label="Search opportunities"></section>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <script src="/static/js/state.js"></script>
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/motion.js"></script>
+  <script src="/static/js/components.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

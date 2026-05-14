@@ -18,6 +18,7 @@ SOURCE_FAILURE_LIMIT = 3
 LLM_BASE_URL = os.environ.get("LLM_BASE_URL", "https://token-plan-sgp.xiaomimimo.com/v1")
 LLM_MODEL = os.environ.get("LLM_MODEL", "mimo-v2-5-pro")
 LLM_API_KEY_ENV = "LLM_API_KEY"
+LLM_API_KEY_FALLBACK_ENV = "OPENAI_API_KEY"
 LLM_TIMEOUT_SECONDS = 60
 LLM_MAX_RETRIES = 2
 LLM_RETRY_BACKOFF_SECONDS = [10, 30]

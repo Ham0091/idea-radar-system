@@ -370,6 +370,19 @@ def enable_source(conn: sqlite3.Connection, source_id: str) -> None:
     )
 
 
+def disable_source(conn: sqlite3.Connection, source_id: str) -> None:
+    conn.execute(
+        """
+        UPDATE source_config
+        SET enabled = 0,
+            disabled_at = ?,
+            consecutive_failures = 0
+        WHERE source_id = ?
+        """,
+        (utc_now_iso(), source_id),
+    )
+
+
 def insert_run_log(conn: sqlite3.Connection, payload: Dict[str, Any]) -> None:
     conn.execute(
         """

@@ -1,0 +1,60 @@
+2026-05-14 14:29:01,915 [INFO] Fetched 8 signals from reddit_r_entrepreneur
+2026-05-14 14:29:02,622 [INFO] Fetched 20 signals from reddit_r_startups
+2026-05-14 14:29:03,119 [INFO] Fetched 19 signals from reddit_r_programming
+2026-05-14 14:29:03,997 [INFO] Fetched 25 signals from hn
+2026-05-14 14:29:05,189 [INFO] Fetched 18 signals from github_trending
+2026-05-14 14:29:20,295 [INFO] Fetched 25 signals from github_issues
+2026-05-14 14:29:20,622 [INFO] Fetched 0 signals from stack_overflow
+2026-05-14 14:29:20,622 [WARNING] Source indiehackers failed: feedparser not installed. Run: pip install feedparser
+2026-05-14 14:29:20,629 [INFO] LLM request Å® https://token-plan-sgp.xiaomimimo.com/v1 using model mimo-v2-5-pro
+2026-05-14 14:29:20,735 [WARNING] LLM call failed, retrying in 10s: LLM request failed: 401 {
+    "error": {
+        "message": "Invalid API Key",
+        "param": "Please provide valid API Key",
+        "code": "401",
+        "type": "invalid_key"
+    }
+}
+
+2026-05-14 14:29:30,741 [INFO] LLM request Å® https://token-plan-sgp.xiaomimimo.com/v1 using model mimo-v2-5-pro
+2026-05-14 14:29:30,845 [WARNING] LLM call failed, retrying in 30s: LLM request failed: 401 {
+    "error": {
+        "message": "Invalid API Key",
+        "param": "Please provide valid API Key",
+        "code": "401",
+        "type": "invalid_key"
+    }
+}
+
+2026-05-14 14:30:00,859 [INFO] LLM request Å® https://token-plan-sgp.xiaomimimo.com/v1 using model mimo-v2-5-pro
+2026-05-14 14:30:00,941 [WARNING] LLM compression failed: LLM request failed: 401 {
+    "error": {
+        "message": "Invalid API Key",
+        "param": "Please provide valid API Key",
+        "code": "401",
+        "type": "invalid_key"
+    }
+}
+
+2026-05-14 14:30:00,942 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
+2026-05-14 14:30:01,063 [WARNING] Missing Telegram credentials
+2026-05-14 15:15:39,525 [INFO] Fetched 6 signals from reddit_r_entrepreneur
+2026-05-14 15:15:39,983 [INFO] Fetched 20 signals from reddit_r_startups
+2026-05-14 15:15:40,385 [INFO] Fetched 19 signals from reddit_r_programming
+2026-05-14 15:15:41,387 [INFO] Fetched 25 signals from hn
+2026-05-14 15:15:42,635 [INFO] Fetched 18 signals from github_trending
+2026-05-14 15:15:57,494 [INFO] Fetched 25 signals from github_issues
+2026-05-14 15:15:57,857 [INFO] Fetched 0 signals from stack_overflow
+2026-05-14 15:15:57,858 [WARNING] Source indiehackers failed: feedparser not installed. Run: pip install feedparser
+2026-05-14 15:15:57,863 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
+2026-05-14 15:15:57,930 [WARNING] Missing Telegram credentials
+2026-05-14 15:19:32,521 [INFO] Fetched 6 signals from reddit_r_entrepreneur
+2026-05-14 15:19:33,178 [INFO] Fetched 20 signals from reddit_r_startups
+2026-05-14 15:19:33,586 [INFO] Fetched 19 signals from reddit_r_programming
+2026-05-14 15:19:34,610 [INFO] Fetched 25 signals from hn
+2026-05-14 15:19:35,990 [INFO] Fetched 18 signals from github_trending
+2026-05-14 15:19:51,636 [INFO] Fetched 25 signals from github_issues
+2026-05-14 15:19:52,386 [INFO] Fetched 0 signals from stack_overflow
+2026-05-14 15:19:52,386 [WARNING] Source indiehackers failed: feedparser not installed. Run: pip install feedparser
+2026-05-14 15:19:52,392 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
+2026-05-14 15:19:52,457 [WARNING] Missing Telegram credentials

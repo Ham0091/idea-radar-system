@@ -105,7 +105,7 @@ def run_pipeline(logger) -> int:
 
         if filtered:
             try:
-                api_key = os.environ.get(config.LLM_API_KEY_ENV, "")
+                api_key = resolve_llm_api_key()
                 client = llm.LLMClient(api_key, logger)
                 compressed_signals, invalid_count, usage = llm.compress_signals(
                     client, filtered
@@ -126,7 +126,7 @@ def run_pipeline(logger) -> int:
             matches = []
             if idea_summaries:
                 try:
-                    api_key = os.environ.get(config.LLM_API_KEY_ENV, "")
+                    api_key = resolve_llm_api_key()
                     client = llm.LLMClient(api_key, logger)
                     matches, invalid_count, usage = llm.match_signals_to_ideas(
                         client, compressed_signals, idea_summaries
@@ -174,7 +174,7 @@ def run_pipeline(logger) -> int:
 
             if unmatched and "match_signals_to_ideas" not in llm_failures:
                 try:
-                    api_key = os.environ.get(config.LLM_API_KEY_ENV, "")
+                    api_key = resolve_llm_api_key()
                     client = llm.LLMClient(api_key, logger)
                     new_idea_objs, invalid_count, usage = llm.create_ideas(
                         client, [compressed_signals[i] for i in unmatched]
@@ -542,6 +542,12 @@ def idea_to_row(idea: IdeaRecord) -> dict:
         "updated_at": idea.updated_at,
         "last_signal_at": idea.last_signal_at,
     }
+
+
+def resolve_llm_api_key() -> str:
+    return os.environ.get(config.LLM_API_KEY_ENV) or os.environ.get(
+        config.LLM_API_KEY_FALLBACK_ENV, ""
+    )
 
 
 if __name__ == "__main__":

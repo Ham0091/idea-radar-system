@@ -1,0 +1,8 @@
+IRS Daily - 2026-05-13
+NOTE: Yesterday's digest failed to send. Retrying.
+
+TOP 10
+SOURCES
+reddit_r_entrepreneur: OK  reddit_r_startups: OK  reddit_r_programming: OK  hn: OK  github_trending: OK  github_issues: OK  stack_overflow: OK  indiehackers: FAIL
+
+Run: 119 fetched, 0 filtered, 0 processed. $0.000.

@@ -16,9 +16,9 @@ from utils import utc_now_iso
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("test")
 
-api_key = os.environ.get("LLM_API_KEY")
+api_key = os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY")
 if not api_key:
-    print("ERROR: LLM_API_KEY not set in environment")
+    print("ERROR: Set LLM_API_KEY (or OPENAI_API_KEY fallback) in environment")
     sys.exit(1)
 
 client = LLMClient(api_key=api_key, logger=logger)

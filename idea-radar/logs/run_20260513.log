@@ -1,0 +1,52 @@
+2026-05-13 20:30:41,318 [INFO] Fetched 6 signals from reddit_r_entrepreneur
+2026-05-13 20:30:42,112 [INFO] Fetched 25 signals from reddit_r_startups
+2026-05-13 20:30:42,539 [INFO] Fetched 20 signals from reddit_r_programming
+2026-05-13 20:30:43,575 [INFO] Fetched 25 signals from hn
+2026-05-13 20:30:44,849 [INFO] Fetched 19 signals from github_trending
+2026-05-13 20:31:00,166 [INFO] Fetched 25 signals from github_issues
+2026-05-13 20:31:00,514 [INFO] Fetched 0 signals from stack_overflow
+2026-05-13 20:31:00,515 [WARNING] Source indiehackers failed: feedparser not installed. Run: pip install feedparser
+2026-05-13 20:31:00,522 [WARNING] LLM compression failed: Missing LLM API key
+2026-05-13 20:31:00,522 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
+2026-05-13 20:31:00,730 [WARNING] Missing Telegram credentials
+2026-05-13 20:32:17,360 [INFO] Fetched 6 signals from reddit_r_entrepreneur
+2026-05-13 20:32:18,218 [INFO] Fetched 25 signals from reddit_r_startups
+2026-05-13 20:32:18,608 [INFO] Fetched 20 signals from reddit_r_programming
+2026-05-13 20:32:19,687 [INFO] Fetched 25 signals from hn
+2026-05-13 20:32:20,954 [INFO] Fetched 19 signals from github_trending
+2026-05-13 20:32:35,643 [INFO] Fetched 25 signals from github_issues
+2026-05-13 20:32:35,958 [INFO] Fetched 0 signals from stack_overflow
+2026-05-13 20:32:37,122 [INFO] Fetched 0 signals from indiehackers
+2026-05-13 20:32:37,130 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
+2026-05-13 20:32:37,211 [WARNING] Missing Telegram credentials
+2026-05-13 20:33:41,955 [INFO] Fetched 6 signals from reddit_r_entrepreneur
+2026-05-13 20:33:42,436 [INFO] Fetched 25 signals from reddit_r_startups
+2026-05-13 20:33:42,859 [INFO] Fetched 20 signals from reddit_r_programming
+2026-05-13 20:33:43,894 [INFO] Fetched 25 signals from hn
+2026-05-13 20:33:45,253 [INFO] Fetched 19 signals from github_trending
+2026-05-13 20:33:59,968 [INFO] Fetched 25 signals from github_issues
+2026-05-13 20:34:00,318 [INFO] Fetched 0 signals from stack_overflow
+2026-05-13 20:34:00,319 [WARNING] Source indiehackers failed: feedparser not installed. Run: pip install feedparser
+2026-05-13 20:34:00,326 [WARNING] LLM compression failed: Missing LLM API key
+2026-05-13 20:34:00,327 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
+2026-05-13 20:34:00,400 [WARNING] Missing Telegram credentials
+2026-05-13 20:34:35,311 [INFO] Fetched 6 signals from reddit_r_entrepreneur
+2026-05-13 20:34:36,067 [INFO] Fetched 25 signals from reddit_r_startups
+2026-05-13 20:34:36,475 [INFO] Fetched 20 signals from reddit_r_programming
+2026-05-13 20:34:37,557 [INFO] Fetched 25 signals from hn
+2026-05-13 20:34:38,831 [INFO] Fetched 19 signals from github_trending
+2026-05-13 20:34:53,526 [INFO] Fetched 25 signals from github_issues
+2026-05-13 20:34:53,827 [INFO] Fetched 0 signals from stack_overflow
+2026-05-13 20:34:53,827 [WARNING] Source indiehackers failed: feedparser not installed. Run: pip install feedparser
+2026-05-13 20:34:53,833 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
+2026-05-13 20:34:53,893 [WARNING] Missing Telegram credentials
+2026-05-13 20:49:37,029 [INFO] Fetched 5 signals from reddit_r_entrepreneur
+2026-05-13 20:49:39,482 [INFO] Fetched 25 signals from reddit_r_startups
+2026-05-13 20:49:41,176 [INFO] Fetched 20 signals from reddit_r_programming
+2026-05-13 20:49:42,173 [INFO] Fetched 25 signals from hn
+2026-05-13 20:49:43,506 [INFO] Fetched 19 signals from github_trending
+2026-05-13 20:49:58,470 [INFO] Fetched 25 signals from github_issues
+2026-05-13 20:49:59,278 [INFO] Fetched 0 signals from stack_overflow
+2026-05-13 20:49:59,278 [WARNING] Source indiehackers failed: feedparser not installed. Run: pip install feedparser
+2026-05-13 20:49:59,289 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
+2026-05-13 20:49:59,373 [WARNING] Missing Telegram credentials

@@ -14,7 +14,9 @@ pip install -r requirements.txt
 3. Create a `.env` file in the project root with your credentials:
 
 ```
-OPENAI_API_KEY=your_key_here
+LLM_API_KEY=your_key_here
+# Optional fallback if LLM_API_KEY is not set:
+# OPENAI_API_KEY=your_key_here
 GITHUB_TOKEN=your_github_token
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 TELEGRAM_CHAT_ID=your_telegram_chat_id
@@ -26,6 +28,12 @@ REDDIT_USER_AGENT=idea-radar/0.1
 ## Run
 
 Run the daily batch pipeline:
+
+```bash
+python src/main.py --run
+```
+
+Manually force a run now (for testing):
 
 ```bash
 python src/main.py --run
@@ -56,6 +64,7 @@ Example daily cron entry (runs at 9:00):
 ## Notes
 
 - The LLM integration uses an OpenAI-compatible Chat Completions endpoint. Override the base URL and model with `LLM_BASE_URL` and `LLM_MODEL` environment variables if needed.
+- You can trigger the same run from the web app via `POST /api/run-now` (temporary manual testing endpoint).
 - GitHub Trending is parsed from HTML and may break if the page layout changes.
 - Reddit OAuth via `praw` is optional. If you want it, install `praw` and set `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, and `REDDIT_USER_AGENT`.
 - Saturation is mapped from GitHub repo count to a 0-10 score using `min(count, 100) / 10`.
