@@ -58,3 +58,90 @@
 2026-05-14 15:19:52,386 [WARNING] Source indiehackers failed: feedparser not installed. Run: pip install feedparser
 2026-05-14 15:19:52,392 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
 2026-05-14 15:19:52,457 [WARNING] Missing Telegram credentials
+2026-05-14 21:52:05,343 [INFO] Fetched 5 signals from reddit_r_entrepreneur
+2026-05-14 21:52:06,129 [INFO] Fetched 25 signals from reddit_r_startups
+2026-05-14 21:52:06,583 [INFO] Fetched 20 signals from reddit_r_programming
+2026-05-14 21:52:08,445 [INFO] Fetched 25 signals from hn
+2026-05-14 21:52:08,520 [INFO] Fetched 15 signals from github_trending
+2026-05-14 21:52:23,702 [INFO] Fetched 25 signals from github_issues
+2026-05-14 21:52:24,088 [INFO] Fetched 0 signals from stack_overflow
+2026-05-14 21:52:24,097 [INFO] LLM request Å® https://token-plan-sgp.xiaomimimo.com/v1 using model mimo-v2-5-pro
+2026-05-14 21:52:24,195 [WARNING] LLM call failed, retrying in 10s: LLM request failed: 401 {
+    "error": {
+        "message": "Invalid API Key",
+        "param": "Please provide valid API Key",
+        "code": "401",
+        "type": "invalid_key"
+    }
+}
+
+2026-05-14 21:52:34,205 [INFO] LLM request Å® https://token-plan-sgp.xiaomimimo.com/v1 using model mimo-v2-5-pro
+2026-05-14 21:52:34,270 [WARNING] LLM call failed, retrying in 30s: LLM request failed: 401 {
+    "error": {
+        "message": "Invalid API Key",
+        "param": "Please provide valid API Key",
+        "code": "401",
+        "type": "invalid_key"
+    }
+}
+
+2026-05-14 21:53:04,274 [INFO] LLM request Å® https://token-plan-sgp.xiaomimimo.com/v1 using model mimo-v2-5-pro
+2026-05-14 21:53:04,343 [WARNING] LLM compression failed: LLM request failed: 401 {
+    "error": {
+        "message": "Invalid API Key",
+        "param": "Please provide valid API Key",
+        "code": "401",
+        "type": "invalid_key"
+    }
+}
+
+2026-05-14 21:53:04,344 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
+2026-05-14 21:53:04,436 [WARNING] Missing Telegram credentials
+2026-05-15 01:41:42,169 [INFO] Fetched 3 signals from reddit_r_entrepreneur
+2026-05-15 01:41:42,919 [INFO] Fetched 25 signals from reddit_r_startups
+2026-05-15 01:41:43,335 [INFO] Fetched 18 signals from reddit_r_programming
+2026-05-15 01:41:44,422 [INFO] Fetched 25 signals from hn
+2026-05-15 01:41:45,571 [INFO] Fetched 15 signals from github_trending
+2026-05-15 01:42:01,060 [INFO] Fetched 25 signals from github_issues
+2026-05-15 01:42:01,385 [INFO] Fetched 0 signals from stack_overflow
+2026-05-15 01:42:01,392 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
+2026-05-15 01:42:01,483 [WARNING] Missing Telegram credentials
+2026-05-15 02:26:13,673 [INFO] Fetched 3 signals from reddit_r_entrepreneur
+2026-05-15 02:26:14,444 [INFO] Fetched 25 signals from reddit_r_startups
+2026-05-15 02:26:15,332 [INFO] Fetched 20 signals from reddit_r_programming
+2026-05-15 02:26:16,317 [INFO] Fetched 25 signals from hn
+2026-05-15 02:26:17,586 [INFO] Fetched 15 signals from github_trending
+2026-05-15 02:26:32,585 [INFO] Fetched 25 signals from github_issues
+2026-05-15 02:26:32,889 [INFO] Fetched 0 signals from stack_overflow
+2026-05-15 02:26:32,896 [INFO] LLM request Å® https://token-plan-sgp.xiaomimimo.com/v1 using model mimo-v2-5-pro
+2026-05-15 02:26:32,990 [WARNING] LLM call failed, retrying in 10s: LLM request failed: 401 {
+    "error": {
+        "message": "Invalid API Key",
+        "param": "Please provide valid API Key",
+        "code": "401",
+        "type": "invalid_key"
+    }
+}
+
+2026-05-15 02:26:43,003 [INFO] LLM request Å® https://token-plan-sgp.xiaomimimo.com/v1 using model mimo-v2-5-pro
+2026-05-15 02:26:43,093 [WARNING] LLM call failed, retrying in 30s: LLM request failed: 401 {
+    "error": {
+        "message": "Invalid API Key",
+        "param": "Please provide valid API Key",
+        "code": "401",
+        "type": "invalid_key"
+    }
+}
+
+2026-05-15 02:27:13,100 [INFO] LLM request Å® https://token-plan-sgp.xiaomimimo.com/v1 using model mimo-v2-5-pro
+2026-05-15 02:27:13,183 [WARNING] LLM compression failed: LLM request failed: 401 {
+    "error": {
+        "message": "Invalid API Key",
+        "param": "Please provide valid API Key",
+        "code": "401",
+        "type": "invalid_key"
+    }
+}
+
+2026-05-15 02:27:13,184 [INFO] Skipping saturation refresh: missing GITHUB_TOKEN
+2026-05-15 02:27:13,282 [WARNING] Missing Telegram credentials

@@ -1,2 +1,9 @@
 .env
 .env.*
+.venv/
+__pycache__/
+*.pyc
+data/*.json
+idea-radar/logs/
+idea-radar/.env
+idea-radar/idea_radar.db

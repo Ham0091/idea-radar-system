@@ -77,6 +77,10 @@ const IRSApi = (() => {
     return request(`/sources/${encodeURIComponent(sourceId)}/disable`, { method: "POST" });
   }
 
+  function runNow() {
+    return request("/run-now", { method: "POST" });
+  }
+
   async function loadDashboard() {
     const [ideas, top10, movers, runs, sources, stats] = await Promise.all([
       fetchIdeas("all"),
@@ -91,20 +95,7 @@ const IRSApi = (() => {
   }
 
   return {
-    fetchIdeas,
-    fetchIdea,
-    fetchTop10,
-    fetchMovers,
-    fetchRuns,
-    fetchSources,
-    fetchStats,
-    dismissIdea,
-    restoreIdea,
-    markBuilding,
-    setScore,
-    setField,
-    enableSource,
-    disableSource,
-    loadDashboard
+    fetchIdeas, fetchIdea, fetchTop10, fetchMovers, fetchRuns, fetchSources, fetchStats,
+    dismissIdea, restoreIdea, markBuilding, setScore, setField, enableSource, disableSource, runNow, loadDashboard
   };
 })();

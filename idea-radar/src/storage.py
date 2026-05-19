@@ -1,10 +1,11 @@
 import json
 import sqlite3
+from datetime import timedelta
 from typing import Any, Dict, Iterable, List, Optional
 
 import config
 from models import IdeaRecord
-from utils import json_dumps, utc_now_iso
+from utils import json_dumps, parse_iso, utc_now, utc_now_iso
 
 SCHEMA_SQL = """
 PRAGMA journal_mode=WAL;
@@ -82,6 +83,26 @@ CREATE TABLE IF NOT EXISTS run_log (
   digest_sent         INTEGER DEFAULT 0,
   digest_path         TEXT
 );
+
+CREATE TABLE IF NOT EXISTS runtime_state (
+  key           TEXT PRIMARY KEY,
+  value         TEXT NOT NULL,
+  updated_at    TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS scheduled_notifications (
+  job_key        TEXT NOT NULL,
+  scheduled_for   TEXT NOT NULL,
+  status         TEXT NOT NULL DEFAULT 'pending',
+  attempt_count  INTEGER DEFAULT 0,
+  locked_at      TEXT,
+  sent_at        TEXT,
+  last_error     TEXT,
+  message_text   TEXT,
+  created_at     TEXT NOT NULL,
+  updated_at     TEXT NOT NULL,
+  PRIMARY KEY (job_key, scheduled_for)
+);
 """
 
 
@@ -140,6 +161,11 @@ def fetch_active_ideas(conn: sqlite3.Connection) -> List[IdeaRecord]:
     rows = conn.execute(
         "SELECT * FROM ideas WHERE user_status IN ('active', 'building')"
     ).fetchall()
+    return [_row_to_idea(row) for row in rows]
+
+
+def fetch_all_ideas(conn: sqlite3.Connection) -> List[IdeaRecord]:
+    rows = conn.execute("SELECT * FROM ideas").fetchall()
     return [_row_to_idea(row) for row in rows]
 
 
@@ -425,3 +451,127 @@ def fetch_run_logs(conn: sqlite3.Connection, limit: int = 10) -> List[Dict[str, 
         "SELECT * FROM run_log ORDER BY timestamp DESC LIMIT ?", (limit,)
     ).fetchall()
     return [dict(row) for row in rows]
+
+
+def fetch_runtime_state(conn: sqlite3.Connection, key: str) -> Optional[str]:
+    row = conn.execute("SELECT value FROM runtime_state WHERE key = ?", (key,)).fetchone()
+    if not row:
+        return None
+    return row["value"]
+
+
+def upsert_runtime_state(conn: sqlite3.Connection, key: str, value: str, updated_at: str) -> None:
+    conn.execute(
+        """
+        INSERT INTO runtime_state (key, value, updated_at)
+        VALUES (?, ?, ?)
+        ON CONFLICT(key) DO UPDATE SET
+          value = excluded.value,
+          updated_at = excluded.updated_at
+        """,
+        (key, value, updated_at),
+    )
+
+
+def claim_scheduled_notification(
+    conn: sqlite3.Connection,
+    job_key: str,
+    scheduled_for: str,
+    now_iso: str,
+    stale_lock_seconds: int,
+) -> bool:
+    conn.execute("BEGIN IMMEDIATE")
+    try:
+        row = conn.execute(
+            """
+            SELECT status, locked_at
+            FROM scheduled_notifications
+            WHERE job_key = ? AND scheduled_for = ?
+            """,
+            (job_key, scheduled_for),
+        ).fetchone()
+
+        if row is None:
+            conn.execute(
+                """
+                INSERT INTO scheduled_notifications (
+                  job_key, scheduled_for, status, attempt_count, locked_at,
+                  sent_at, last_error, message_text, created_at, updated_at
+                )
+                VALUES (?, ?, 'sending', 1, ?, NULL, NULL, NULL, ?, ?)
+                """,
+                (job_key, scheduled_for, now_iso, now_iso, now_iso),
+            )
+            conn.commit()
+            return True
+
+        if row["status"] == "sent":
+            conn.rollback()
+            return False
+
+        locked_at = parse_iso(row["locked_at"])
+        if row["status"] == "sending" and locked_at is not None:
+            age = utc_now() - locked_at
+            if age < timedelta(seconds=stale_lock_seconds):
+                conn.rollback()
+                return False
+
+        conn.execute(
+            """
+            UPDATE scheduled_notifications
+            SET status = 'sending',
+                attempt_count = attempt_count + 1,
+                locked_at = ?,
+                updated_at = ?,
+                last_error = NULL
+            WHERE job_key = ? AND scheduled_for = ?
+            """,
+            (now_iso, now_iso, job_key, scheduled_for),
+        )
+        conn.commit()
+        return True
+    except Exception:
+        conn.rollback()
+        raise
+
+
+def mark_scheduled_notification_sent(
+    conn: sqlite3.Connection,
+    job_key: str,
+    scheduled_for: str,
+    sent_at: str,
+    message_text: str,
+) -> None:
+    conn.execute(
+        """
+        UPDATE scheduled_notifications
+        SET status = 'sent',
+            sent_at = ?,
+            message_text = ?,
+            locked_at = NULL,
+            last_error = NULL,
+            updated_at = ?
+        WHERE job_key = ? AND scheduled_for = ?
+        """,
+        (sent_at, message_text, sent_at, job_key, scheduled_for),
+    )
+
+
+def mark_scheduled_notification_failed(
+    conn: sqlite3.Connection,
+    job_key: str,
+    scheduled_for: str,
+    failed_at: str,
+    error_message: str,
+) -> None:
+    conn.execute(
+        """
+        UPDATE scheduled_notifications
+        SET status = 'pending',
+            last_error = ?,
+            locked_at = NULL,
+            updated_at = ?
+        WHERE job_key = ? AND scheduled_for = ?
+        """,
+        (error_message, failed_at, job_key, scheduled_for),
+    )

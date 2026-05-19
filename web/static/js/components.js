@@ -151,6 +151,48 @@ const IRSComponents = (() => {
     `;
   }
 
+  function viewActions(actions) {
+    return `
+      <div class="view-actions">
+        ${actions.map((action) => `
+          <button class="view-action ${action.variant || ""}" type="button" data-action="${escapeHtml(action.id)}">
+            ${escapeHtml(action.label)}
+          </button>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function loadingState(title = "Loading signals", subtitle = "Building the next view from the pipeline.") {
+    return `
+      <section class="empty-state">
+        <div>
+          <div class="view-kicker">${escapeHtml(title)}</div>
+          <p class="empty-state-copy" style="margin-top:8px;">${escapeHtml(subtitle)}</p>
+        </div>
+        <div class="loading-stack" aria-hidden="true">
+          ${Array.from({ length: 3 }).map(() => `
+            <article class="skeleton-card loading-card">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+              <div class="skeleton-pill"></div>
+            </article>
+          `).join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  function emptyState(title, copy) {
+    return `
+      <section class="empty-state">
+        <div class="view-kicker">${escapeHtml(title)}</div>
+        <p class="empty-state-title">${escapeHtml(copy)}</p>
+      </section>
+    `;
+  }
+
   function dominantSemantic(idea) {
     const pain = score(idea.pain);
     const build = score(idea.buildability);
@@ -490,9 +532,9 @@ const IRSComponents = (() => {
       <h2 class="sheet-heading">Search</h2>
       <label class="screen-reader-only" for="searchInput">Search opportunities</label>
       <input id="searchInput" class="sheet-input" placeholder="Search opportunities..." value="${escapeHtml(query || "")}" autocomplete="off">
-      ${!q ? '<p class="view-subtitle" style="margin-top:10px;">Start typing to search across all signals.</p>' : ""}
+      ${!q ? '<p class="view-subtitle" style="margin-top:10px;">Start typing to search across all signals.</p>' : `<p class="view-subtitle" style="margin-top:10px;">${filtered.length} result${filtered.length === 1 ? "" : "s"} found.</p>`}
       <div class="search-results">
-        ${filtered.map((idea) => compactCard(idea)).join("")}
+        ${filtered.length ? filtered.map((idea) => compactCard(idea)).join("") : q ? emptyState("No matches yet.", "Try a broader keyword or clear part of the query.") : ""}
       </div>
     `;
   }
@@ -519,6 +561,9 @@ const IRSComponents = (() => {
     chapterByline,
     chapterStickyLabel,
     chapterDivider,
+    viewActions,
+    loadingState,
+    emptyState,
     dominantSemantic,
     sparklinePath,
     dailySignalSeries,

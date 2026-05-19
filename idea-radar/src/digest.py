@@ -1,15 +1,9 @@
-import os
-import time
 from typing import Dict, List, Optional, Tuple
-
-import requests
 
 import config
 from models import IdeaRecord, SourceResult
+from telegram_client import send_telegram_message
 from utils import format_display_date, utc_now_iso
-
-TELEGRAM_LIMIT = 4096
-
 
 def format_digest(
     run_date_iso: str,
@@ -104,49 +98,8 @@ def openness_label(saturation: float) -> str:
 
 
 def send_digest(text: str, logger) -> Tuple[bool, Optional[str]]:
-    token = os.environ.get("TELEGRAM_BOT_TOKEN")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-    if not token or not chat_id:
-        logger.warning("Missing Telegram credentials")
-        return False, None
-
-    chunks = split_message(text)
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-
-    for attempt in range(2):
-        success = True
-        for chunk in chunks:
-            response = requests.post(
-                url,
-                data={"chat_id": chat_id, "text": chunk},
-                timeout=10,
-            )
-            if response.status_code >= 400:
-                success = False
-                logger.warning("Telegram send failed: %s", response.text)
-                break
-        if success:
-            return True, None
-        if attempt == 0:
-            time.sleep(30)
-
-    return False, None
-
-
-def split_message(text: str) -> List[str]:
-    if len(text) <= TELEGRAM_LIMIT:
-        return [text]
-    parts = []
-    remaining = text
-    while len(remaining) > TELEGRAM_LIMIT:
-        split_at = remaining.rfind("\n\n", 0, TELEGRAM_LIMIT)
-        if split_at == -1:
-            split_at = TELEGRAM_LIMIT
-        parts.append(remaining[:split_at].strip())
-        remaining = remaining[split_at:].strip()
-    if remaining:
-        parts.append(remaining)
-    return parts
+    sent = send_telegram_message(text, logger)
+    return sent, None
 
 
 def write_digest_fallback(text: str, log_dir) -> str:

@@ -24,7 +24,8 @@ const IRSState = (() => {
       searchQuery: "",
       page: 1
     },
-    keyboardFocusIndex: 0
+    keyboardFocusIndex: 0,
+    pipelineRunning: false
   };
 
   const listeners = new Set();

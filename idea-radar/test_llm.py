@@ -16,10 +16,10 @@ from utils import utc_now_iso
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("test")
 
+import pytest
 api_key = os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY")
-if not api_key:
-    print("ERROR: Set LLM_API_KEY (or OPENAI_API_KEY fallback) in environment")
-    sys.exit(1)
+if not api_key or api_key == "dummy":
+    pytest.skip("Skipping LLM smoke test (no valid LLM API key)", allow_module_level=True)
 
 client = LLMClient(api_key=api_key, logger=logger)
 

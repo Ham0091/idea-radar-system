@@ -1,5 +1,16 @@
 {
+  "name": "idea-radar-web",
+  "version": "1.0.0",
+  "description": "Mobile-first intelligence interface for Idea Radar System",
+  "scripts": {
+    "lint": "npx eslint \"static/**/*.js\" --ignore-pattern node_modules",
+    "test": "echo 'No tests configured yet' && exit 0",
+    "build": "echo 'Vanilla JS - no build needed' && exit 0"
+  },
   "dependencies": {
     "impeccable": "^2.1.9"
+  },
+  "devDependencies": {
+    "eslint": "^8.50.0"
   }
 }

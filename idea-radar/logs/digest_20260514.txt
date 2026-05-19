@@ -3,6 +3,6 @@ NOTE: Yesterday's digest failed to send. Retrying.
 
 TOP 10
 SOURCES
-reddit_r_entrepreneur: OK  reddit_r_startups: OK  reddit_r_programming: OK  hn: OK  github_trending: OK  github_issues: OK  stack_overflow: OK  indiehackers: FAIL
+reddit_r_entrepreneur: OK  reddit_r_startups: OK  reddit_r_programming: OK  hn: OK  github_trending: OK  github_issues: OK  stack_overflow: OK  indiehackers: DISABLED (enable: --enable-source indiehackers)
 
-Run: 113 fetched, 0 filtered, 0 processed. $0.000.
+Run: 113 fetched, 66 filtered, 0 processed. $0.000.

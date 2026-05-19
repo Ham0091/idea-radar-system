@@ -144,9 +144,11 @@
     if (!top10.length) {
       dom.viewRadar.innerHTML = `
         <header class="view-header">
+          <div class="view-kicker">Daily snapshot</div>
           <h1 class="view-title">Radar</h1>
+          <p class="view-subtitle">Loading opportunities from the pipeline.</p>
         </header>
-        ${IRSComponents.emptyLine("Nothing surfaced yet. Next ingestion in Xh.")}
+        ${IRSComponents.loadingState("Loading radar", "Pulling in the newest ideas and arranging the feed for mobile scanning.")}
       `;
       return;
     }
@@ -186,17 +188,25 @@
 
     dom.viewRadar.innerHTML = `
       <header class="view-header">
+        <div class="view-kicker">Daily snapshot</div>
         <h1 class="view-title">Radar</h1>
         <p class="view-subtitle">${top10.length} opportunities in active rotation</p>
       </header>
+      ${IRSComponents.viewActions([
+        { id: "open-search", label: "Search" },
+        { id: "switch-explore", label: "Explore" },
+        { id: "refresh", label: "Refresh", variant: "is-primary" },
+        { id: "open-settings", label: "Settings" }
+      ])}
       ${sections.join("")}
-      <section class="empty-line">You&#39;re caught up. Next ingestion in Xh.</section>
+      ${IRSComponents.emptyState("You’re caught up.", "Swipe through the active ideas above. New signals will surface when the pipeline refreshes.")}
     `;
 
     bindChapterDividerReveal(dom.viewRadar);
     bindSignalCards(dom.viewRadar);
     revealVisibleCards(dom.viewRadar);
     observeScoreCountUps(dom.viewRadar);
+    bindViewActions(dom.viewRadar);
   }
 
   function moversForRange(range) {
@@ -280,21 +290,23 @@
           rank: 0,
           detail: IRSState.getDetailById(idea.id)
         })).join("")
-      : IRSComponents.emptyLine("No signals match these filters.");
+      : filtered.length
+        ? ""
+        : IRSComponents.emptyState("No matching ideas.", "Try clearing a filter or use search to find adjacent opportunities.");
 
     dom.viewExplore.innerHTML = `
       <header class="view-header">
+        <div class="view-kicker">Catalog</div>
         <h1 class="view-title">Explore</h1>
         <p class="view-subtitle">Browse and filter opportunity space.</p>
       </header>
+      ${IRSComponents.viewActions([
+        { id: "open-search", label: "Search" },
+        { id: "open-sort", label: "Sort", variant: "is-primary" },
+        { id: "clear-filters", label: activeFilters.length ? "Clear filters" : "Filters" }
+      ])}
       <div class="filter-row">
         <div class="chip-scroll">${chips}</div>
-        <button class="icon-button" type="button" data-open-search aria-label="Search opportunities">
-          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm9 16-4.2-4.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </button>
-      </div>
-      <div class="sort-row">
-        <button class="sort-button" type="button" data-open-sort>Sort: ${sort === "score" ? "Score" : sort === "momentum" ? "Momentum delta" : sort === "recency" ? "Recency" : "Build complexity"} ↓</button>
       </div>
       <section class="explore-grid">
         ${cards}
@@ -316,6 +328,7 @@
     revealVisibleCards(dom.viewExplore);
     observeScoreCountUps(dom.viewExplore);
     bindExploreInfiniteScroll(hasMore);
+    bindViewActions(dom.viewExplore);
   }
 
   function makeLinePath(values, width, height) {
@@ -389,17 +402,34 @@
           .join("")
       : `<p class="view-subtitle">No failures in recent runs.</p>`;
 
+    const isRunning = IRSState.get("pipelineRunning");
+  
     dom.viewSystem.innerHTML = `
       <header class="view-header">
+        <div class="view-kicker">Health</div>
         <h1 class="view-title">System</h1>
         <p class="view-subtitle">Pipeline health and ingestion behavior.</p>
       </header>
-
+      ${IRSComponents.viewActions([
+        { id: "run-pipeline", label: "Run pipeline", variant: "is-primary" },
+        { id: "refresh", label: "Refresh" },
+        { id: "open-settings", label: "Settings" }
+      ])}
+      <section class="inspect-section is-visible">
+        <h3 class="eyebrow-row"><span>PIPELINE CONTROL</span></h3>
+        <div style="margin-top:14px; display:flex; align-items:center; gap:12px;">
+          <button class="chip ${isRunning ? "" : "is-active"}" type="button" id="runPipelineBtn" ${isRunning ? "disabled" : ""} data-run-pipeline>
+            ${isRunning ? "Running…" : "Run Pipeline"}
+          </button>
+          <span class="view-subtitle" id="pipelineRunStatus">${isRunning ? "Pipeline is running, please wait…" : "Trigger a full signal collection and scoring cycle."}</span>
+        </div>
+      </section>
+  
       <section class="inspect-section is-visible">
         <h3 class="eyebrow-row"><span>PIPELINE STATUS</span></h3>
         <div class="pipeline-cards" style="margin-top:14px;">${pipelineCards || IRSComponents.emptyLine("No source status available.")}</div>
       </section>
-
+  
       <section class="inspect-section is-visible">
         <h3 class="eyebrow-row"><span>SIGNAL VOLUME</span></h3>
         <div class="signal-volume" style="margin-top:14px;">
@@ -409,22 +439,44 @@
         </div>
         <p class="view-subtitle" style="margin-top:8px;">Active ideas ${stats ? stats.active_ideas : 0} · Building ${stats ? stats.building_ideas : 0} · Total signals ${stats ? stats.total_signals : 0}</p>
       </section>
-
+  
       <section class="inspect-section is-visible">
         <h3 class="eyebrow-row"><span>FAILURES</span></h3>
         <div class="failure-list" style="margin-top:14px;">${failuresHtml}</div>
       </section>
-
+  
       <section class="inspect-section is-visible">
         <h3 class="eyebrow-row"><span>ABOUT THE PIPELINE</span></h3>
         <p class="view-subtitle" style="margin-top:12px;">Signals are ingested from configured sources, compressed with the LLM layer, and matched into opportunities before deterministic scoring persists the result set.</p>
         <p class="view-subtitle" style="margin-top:10px;">Failures are retried and source health updates are reflected in source status cards and run logs.</p>
       </section>
     `;
-
+  
+    const runBtn = $("#runPipelineBtn");
+    if (runBtn) {
+      runBtn.addEventListener("click", async () => {
+        IRSState.set({ pipelineRunning: true });
+        renderSystem();
+        try {
+          const result = await IRSApi.runNow();
+          if (result.ok) {
+            showToast("Pipeline run completed successfully.", "success");
+          } else {
+            showToast("Pipeline run finished with errors.", "error");
+          }
+        } catch (error) {
+          showToast("Pipeline run failed: " + error.message, "error");
+        }
+        IRSState.set({ pipelineRunning: false });
+        await refreshData();
+        renderAll();
+      });
+    }
+  
     const failed = failures.length > 0;
     dom.viewSystem.classList.toggle("is-failed", failed);
     dom.viewSystem.classList.toggle("is-idle", !failed && !runs.length);
+    bindViewActions(dom.viewSystem);
   }
 
   function toggleExploreFilter(label) {
@@ -924,6 +976,14 @@
     await preloadTopDetails();
   }
 
+  async function refreshAndRender(showToastMessage = false) {
+    await refreshData();
+    renderAll();
+    if (showToastMessage) {
+      showToast("Refreshed.", "success");
+    }
+  }
+
   function renderAll() {
     renderRadar();
     renderMovers();
@@ -931,6 +991,38 @@
     renderSystem();
     switchView(IRSState.get("currentView"));
     updateTimeRhythm();
+  }
+
+  function bindViewActions(scope) {
+    $$(".view-action", scope).forEach((button) => {
+      button.addEventListener("click", async () => {
+        const action = button.dataset.action;
+        if (action === "open-search") {
+          openSearchSheet();
+        } else if (action === "switch-explore") {
+          switchView("explore");
+        } else if (action === "open-settings") {
+          openSettingsSheet();
+        } else if (action === "refresh") {
+          try {
+            button.disabled = true;
+            await refreshAndRender(true);
+          } finally {
+            button.disabled = false;
+          }
+        } else if (action === "run-pipeline") {
+          const runBtn = $("#runPipelineBtn");
+          if (runBtn) {
+            runBtn.click();
+          }
+        } else if (action === "clear-filters") {
+          IRSState.setNested("explore", (explore) => ({ ...explore, activeFilters: [], page: 1 }));
+          renderExplore();
+        } else if (action === "open-sort") {
+          openSortSheet();
+        }
+      });
+    });
   }
 
   async function initialize() {
@@ -959,9 +1051,11 @@
       IRSState.set({ loading: false, error: error.message });
       dom.viewRadar.innerHTML = `
         <header class="view-header">
+          <div class="view-kicker">Daily snapshot</div>
           <h1 class="view-title">Radar</h1>
+          <p class="view-subtitle">The pipeline didn’t answer this time.</p>
         </header>
-        ${IRSComponents.emptyLine("Couldn&#39;t reach the pipeline. Retrying in Xs.")}
+        ${IRSComponents.emptyState("Couldn’t reach the pipeline.", "Check the backend, then pull to refresh again.")}
       `;
       showToast("Connection failed. Please try again.", "error");
     }

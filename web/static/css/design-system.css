@@ -1,7 +1,7 @@
 :root {
   color-scheme: dark;
 
-  --bg-base: #0b0d10;
+  --bg-base: #090b0f;
   --bg-secondary: #111318;
   --surface-1: rgba(23, 26, 33, 0.72);
   --surface-2: rgba(29, 33, 41, 0.78);
@@ -16,8 +16,8 @@
   --hairline: rgba(255, 255, 255, 0.06);
   --hairline-soft: rgba(255, 255, 255, 0.04);
 
-  --font-ui: "Inter", "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-ui: "Outfit", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --display: 44px;
   --title-xl: 32px;
@@ -87,6 +87,7 @@ body {
   margin: 0;
   min-height: 100dvh;
   font-family: var(--font-ui);
+  line-height: 1.5;
   color: var(--text-primary);
   background: var(--bg-base);
   overflow-x: hidden;
@@ -112,6 +113,13 @@ button {
   background: transparent;
   padding: 0;
   cursor: pointer;
+}
+
+button,
+input,
+textarea,
+select {
+  touch-action: manipulation;
 }
 
 a {

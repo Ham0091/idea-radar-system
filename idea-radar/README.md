@@ -20,10 +20,22 @@ LLM_API_KEY=your_key_here
 GITHUB_TOKEN=your_github_token
 TELEGRAM_BOT_TOKEN=your_telegram_bot_token
 TELEGRAM_CHAT_ID=your_telegram_chat_id
+SERVER_URL=https://your-public-server.example.com
 REDDIT_CLIENT_ID=your_reddit_client_id
 REDDIT_CLIENT_SECRET=your_reddit_client_secret
 REDDIT_USER_AGENT=idea-radar/0.1
+TELEGRAM_DAILY_TZ=Asia/Kuala_Lumpur
+TELEGRAM_DAILY_HOUR=8
+TELEGRAM_DAILY_MINUTE=45
 ```
+
+## Telegram Setup
+
+1. Create a bot with `@BotFather` and copy the token.
+2. Send a message to the bot, then retrieve your chat ID with `@userinfobot` or the Telegram Bot API `getUpdates` endpoint.
+3. Add `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` to your `.env`.
+4. Set `SERVER_URL` if you want to pin a public URL.
+5. The Flask API starts the daily scheduler automatically and sends one message per day at 8:45 AM `Asia/Kuala_Lumpur`.
 
 ## Run
 
@@ -60,6 +72,8 @@ Example daily cron entry (runs at 9:00):
 ```cron
 0 9 * * * cd /idea-radar && /usr/bin/python3 src/main.py --run
 ```
+
+The built-in Telegram scheduler does not require cron; it starts with the Flask API server.
 
 ## Notes
 

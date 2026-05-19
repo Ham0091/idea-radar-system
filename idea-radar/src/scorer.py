@@ -139,6 +139,12 @@ def refresh_saturation(
     ideas: List[IdeaRecord],
     logger,
 ) -> Dict[str, Tuple[float, str]]:
+    """Refresh saturation (GitHub search) using a thread pool to avoid serial sleeps.
+
+    Returns a mapping of idea.id -> (saturation, updated_at_iso). If GITHUB_TOKEN is missing,
+    returns empty dict. If rate limits are encountered, the function stops and returns
+    whatever it collected so far.
+    """
     token = os.environ.get("GITHUB_TOKEN")
     if not token:
         logger.info("Skipping saturation refresh: missing GITHUB_TOKEN")
@@ -148,38 +154,75 @@ def refresh_saturation(
     now_iso = utc_now_iso()
     updates: Dict[str, Tuple[float, str]] = {}
 
+    # Build list of ideas that need refresh
+    to_check = []
     for idea in ideas:
         updated_at = parse_datetime(idea.saturation_updated_at) if idea.saturation_updated_at else None
         if updated_at:
             age = datetime.now(timezone.utc) - updated_at
             if age.days < config.SATURATION_TTL_DAYS:
                 continue
+        to_check.append(idea)
 
+    if not to_check:
+        return {}
+
+    import concurrent.futures
+
+    def _fetch_saturation(idea: IdeaRecord):
         keywords = [kw for kw in idea.keywords if kw][:2]
         if not keywords:
             keywords = idea.title.split()[:2]
         query = " ".join(keywords) + " in:description"
-
-        response = requests.get(
-            "https://api.github.com/search/repositories",
-            params={"q": query},
-            headers=headers,
-            timeout=config.SOURCE_TIMEOUT_SECONDS,
-        )
-
-        if response.status_code in {403, 429}:
-            logger.warning("Rate limit hit during saturation refresh")
-            break
-
         try:
+            response = requests.get(
+                "https://api.github.com/search/repositories",
+                params={"q": query},
+                headers=headers,
+                timeout=config.SOURCE_TIMEOUT_SECONDS,
+            )
+            if response.status_code in {403, 429}:
+                # Signal rate limit via exception to the caller
+                raise RuntimeError("rate_limited")
             response.raise_for_status()
             data = response.json()
             total = int(data.get("total_count", 0))
             saturation = min(total, config.SATURATION_CAP_REPOS) / 10.0
-            updates[idea.id] = (saturation, now_iso)
+            return idea.id, (saturation, now_iso)
         except Exception as exc:
+            # Return failure mark for this idea
             logger.warning("Saturation refresh failed for idea %s: %s", idea.id, exc)
+            return idea.id, None
 
-        time.sleep(config.SATURATION_REQUEST_SLEEP_SECONDS)
+    rate_limited = False
+    max_workers = min(8, max(2, len(to_check)))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as ex:
+        future_to_idea = {ex.submit(_fetch_saturation, idea): idea for idea in to_check}
+        for fut in concurrent.futures.as_completed(future_to_idea):
+            idea = future_to_idea[fut]
+            try:
+                result = fut.result()
+            except RuntimeError as exc:
+                if str(exc) == "rate_limited":
+                    logger.warning("Rate limit hit during saturation refresh")
+                    rate_limited = True
+                    break
+                else:
+                    logger.warning("Unexpected error fetching saturation for %s: %s", idea.id, exc)
+                    continue
+            except Exception as exc:
+                logger.warning("Unexpected error fetching saturation for %s: %s", idea.id, exc)
+                continue
+
+            if result is None:
+                continue
+            idea_id, val = result
+            if val is None:
+                # individual fetch failed; skip
+                continue
+            updates[idea_id] = val
+
+            if rate_limited:
+                break
 
     return updates
