@@ -13,6 +13,7 @@ from telegram_client import resolve_telegram_credentials, send_telegram_message
 from utils import utc_now, utc_now_iso
 
 JOB_KEY = "daily-server-link"
+PIPELINE_JOB_KEY = "daily-pipeline-run"
 SERVER_URL_STATE_KEY = "latest_server_url"
 
 _scheduler_lock = threading.Lock()
@@ -151,10 +152,56 @@ def send_daily_server_message(logger: logging.Logger, now: Optional[datetime] = 
             return False
 
 
+def _run_daily_pipeline(app, logger: logging.Logger) -> bool:
+    """Run the data pipeline once per day. Returns True if a run was triggered."""
+    now = utc_now()
+    scheduled_for = _scheduled_for_day(now)
+    if not scheduled_for:
+        return False
+
+    storage.init_db(str(config.DB_PATH))
+    with storage.get_connection(str(config.DB_PATH)) as conn:
+        with conn:
+            if not storage.claim_scheduled_notification(
+                conn,
+                PIPELINE_JOB_KEY,
+                scheduled_for,
+                utc_now_iso(),
+                config.TELEGRAM_SCHEDULER_STALE_LOCK_SECONDS,
+            ):
+                return False
+
+            logger.info("Running daily pipeline for %s", scheduled_for)
+            try:
+                from main import run_pipeline
+                result = run_pipeline(logger)
+                if result == 0:
+                    storage.mark_scheduled_notification_sent(
+                        conn, PIPELINE_JOB_KEY, scheduled_for, utc_now_iso(),
+                        "Pipeline completed successfully",
+                    )
+                    logger.info("Daily pipeline completed successfully for %s", scheduled_for)
+                    return True
+                else:
+                    storage.mark_scheduled_notification_failed(
+                        conn, PIPELINE_JOB_KEY, scheduled_for, utc_now_iso(),
+                        f"Pipeline exited with code {result}",
+                    )
+                    logger.warning("Daily pipeline exited with code %d for %s", result, scheduled_for)
+                    return False
+            except Exception as exc:
+                storage.mark_scheduled_notification_failed(
+                    conn, PIPELINE_JOB_KEY, scheduled_for, utc_now_iso(),
+                    str(exc),
+                )
+                logger.exception("Daily pipeline failed for %s", scheduled_for)
+                return False
+
+
 def _scheduler_loop(app) -> None:
     logger = app.logger.getChild("telegram_scheduler")
     logger.info(
-        "Daily Telegram scheduler started for %s at %02d:%02d",
+        "Daily scheduler started for %s at %02d:%02d",
         config.TELEGRAM_DAILY_TZ,
         config.TELEGRAM_DAILY_HOUR,
         config.TELEGRAM_DAILY_MINUTE,
@@ -165,6 +212,10 @@ def _scheduler_loop(app) -> None:
             send_daily_server_message(logger)
         except Exception:
             logger.exception("Daily Telegram scheduler tick failed")
+        try:
+            _run_daily_pipeline(app, logger)
+        except Exception:
+            logger.exception("Daily pipeline run tick failed")
         _stop_event.wait(config.TELEGRAM_SCHEDULER_POLL_SECONDS)
 
 
