@@ -33,3 +33,7 @@ OPENAI_API_KEY=your_key_here
 - `start_web.bat` → starts the web API/UI
 - `run_pipeline_now.bat` → runs the pipeline immediately (manual trigger)
 - `test_llm_now.bat` → sends a direct LLM test request using sample signals
+
+## Raspberry Pi deploy
+
+If you want the Pi Zero 2 W package, use `deploy/pi-zero-2w/install.sh` from the repo root.

@@ -1,0 +1,16 @@
+[Unit]
+Description=Idea Radar System
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/idea-radar-system/idea-radar
+Environment=SERVE_FRONTEND=1
+EnvironmentFile=-/opt/idea-radar-system/idea-radar/.env
+ExecStart=/opt/idea-radar-system/.venv/bin/python -m flask --app src.api run --host=0.0.0.0 --port=8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

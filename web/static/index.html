@@ -3,38 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0b0d10">
-  <meta name="description" content="Idea Radar System — a mobile-first intelligence interface for discovering and ranking opportunities.">
-  <meta property="og:title" content="Idea Radar System">
+  <meta name="theme-color" content="#F7F6F3">
+  <meta name="description" content="Idea Radar — a personal intelligence system for discovering and ranking opportunities.">
+  <meta property="og:title" content="Idea Radar">
   <meta property="og:description" content="A personal intelligence system that shapes what you notice.">
   <meta property="og:type" content="website">
-  <title>Idea Radar System</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0d10'/%3E%3Ctext x='50%25' y='52%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3ff' font-family='monospace' font-size='28'%3EIR%3C/text%3E%3C/svg%3E">
+  <title>Idea Radar</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23111111'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' fill='%23F7F6F3' font-family='monospace' font-size='24' font-weight='600'%3EIR%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/design-system.css">
   <link rel="stylesheet" href="/static/css/layout.css">
   <link rel="stylesheet" href="/static/css/components.css">
   <link rel="stylesheet" href="/static/css/motion.css">
+  <style>
+    :root {
+      --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-serif: 'Instrument Serif', Georgia, serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#mainContent">Skip to content</a>
 
-  <div id="app" data-tier="standard">
-    <div class="ambient-layer ambient-base" aria-hidden="true"></div>
-    <div class="ambient-layer ambient-drift" aria-hidden="true"></div>
-    <div class="ambient-layer ambient-grain" aria-hidden="true"></div>
-
+  <div id="app">
     <header class="top-bar">
       <div class="top-bar-row">
-        <button class="app-mark" id="appMark" type="button" aria-label="Go to Radar">IRS</button>
+        <button class="app-mark" id="appMark" type="button" aria-label="Go to Radar">Idea Radar</button>
         <button class="profile-chip" id="profileChip" type="button" aria-haspopup="dialog" aria-controls="settingsSheet" aria-label="Open settings">
           IR
         </button>
       </div>
-      <div class="time-rhythm" aria-hidden="true">
-        <div class="time-rhythm-fill" id="timeRhythmFill"></div>
+      <div class="scroll-progress" aria-hidden="true">
+        <div class="scroll-progress-fill" id="scrollProgressFill"></div>
       </div>
     </header>
 
@@ -42,34 +45,40 @@
       <section class="view is-active" id="viewRadar" data-view="radar" aria-label="Radar"></section>
       <section class="view" id="viewMovers" data-view="movers" aria-label="Movers"></section>
       <section class="view" id="viewExplore" data-view="explore" aria-label="Explore"></section>
-      <section class="view view-system" id="viewSystem" data-view="system" aria-label="System"></section>
+      <section class="view" id="viewSystem" data-view="system" aria-label="System"></section>
     </main>
 
     <nav class="bottom-nav" aria-label="Primary navigation">
       <button class="nav-item is-active" type="button" data-nav="radar" aria-label="Radar">
-        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
-          <path d="M12 4a8 8 0 1 0 8 8M12 8a4 4 0 1 1-4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <circle cx="12" cy="12" r="5"/>
+          <circle cx="12" cy="12" r="1"/>
+          <line x1="12" y1="3" x2="12" y2="1"/>
         </svg>
         <span class="nav-label">Radar</span>
         <span class="nav-dot" aria-hidden="true"></span>
       </button>
       <button class="nav-item" type="button" data-nav="movers" aria-label="Movers">
-        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
-          <path d="M4 17h4l3-5 3 3 6-9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 8 13 11 16 14 13 20 7"/>
+          <polyline points="15 7 20 7 20 12"/>
         </svg>
         <span class="nav-label">Movers</span>
         <span class="nav-dot" aria-hidden="true"></span>
       </button>
       <button class="nav-item" type="button" data-nav="explore" aria-label="Explore">
-        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
-          <path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm9 16-4.2-4.2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="16.5" y1="16.5" x2="21" y2="21"/>
         </svg>
         <span class="nav-label">Explore</span>
         <span class="nav-dot" aria-hidden="true"></span>
       </button>
       <button class="nav-item" type="button" data-nav="system" aria-label="System">
-        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true">
-          <path d="M12 3v4m0 10v4M4.2 7l3.4 2m8.8 6 3.4 2M3 12h4m10 0h4M4.2 17l3.4-2m8.8-6 3.4-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        <svg viewBox="0 0 24 24" class="nav-icon" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 1v4m0 14v4M4.22 4.22l2.83 2.83m9.9 9.9 2.83 2.83M1 12h4m14 0h4M4.22 19.78l2.83-2.83m9.9-9.9 2.83-2.83"/>
         </svg>
         <span class="nav-label">System</span>
         <span class="nav-dot" aria-hidden="true"></span>
@@ -80,7 +89,6 @@
 
     <aside class="inspect-panel" id="inspectPanel" aria-hidden="true" aria-label="Inspect opportunity">
       <div class="inspect-handle" aria-hidden="true"></div>
-      <div class="scanline-pass" id="inspectScanline" aria-hidden="true"></div>
       <div class="inspect-inner" id="inspectInner"></div>
     </aside>
 

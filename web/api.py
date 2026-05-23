@@ -17,7 +17,7 @@ from flask import Flask, g, jsonify, request
 from flask_cors import CORS
 
 # Allow running from web/ dir or project root
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "idea-radar" / "src"))
+sys.path.insert(0, str(Path(__file__).parents[1] / "idea-radar" / "src"))
 
 import storage
 import scorer
@@ -26,7 +26,7 @@ import config as pipeline_config
 app = Flask(__name__, static_folder="static", static_url_path="/static")
 CORS(app)
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).parents[1]
 PIPELINE_DIR = PROJECT_ROOT / "idea-radar"
 PIPELINE_MAIN = PIPELINE_DIR / "src" / "main.py"
 DB_PATH = str(PIPELINE_DIR / "idea_radar.db")

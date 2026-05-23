@@ -1,81 +1,51 @@
 const IRSMotion = (() => {
+  "use strict";
+
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-  function detectTier(appearance = "default") {
-    const width = window.innerWidth;
-    const lowWidth = width < 360;
-    const highWidth = width >= 1024;
-    const lowPower = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
-
-    if (appearance === "off" || lowWidth || lowPower) {
-      return "low";
-    }
-    if (highWidth && appearance !== "off") {
-      return "high";
-    }
-    return "standard";
-  }
-
-  function applyEnvironment(appElement, options = {}) {
-    const appearance = options.appearance || "default";
-    const reducedMotion = options.reducedMotion || prefersReducedMotion.matches;
-    const tier = detectTier(appearance);
-
-    appElement.dataset.tier = tier;
-    appElement.dataset.effects = appearance;
-    appElement.dataset.reducedMotion = reducedMotion ? "true" : "false";
-  }
-
+  /**
+   * Stagger-reveal a list of elements by adding `is-visible` class
+   * with a per-element delay. Uses IntersectionObserver when available.
+   */
   function revealStagger(elements, intervalMs = 60) {
-    elements.forEach((element, index) => {
-      const delay = prefersReducedMotion.matches ? 0 : index * intervalMs;
-      window.setTimeout(() => {
-        element.classList.add("is-visible");
-      }, delay);
+    if (prefersReducedMotion.matches) {
+      elements.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+    elements.forEach((el, i) => {
+      window.setTimeout(() => el.classList.add("is-visible"), i * intervalMs);
     });
   }
 
-  function cascadeIn(elements, intervalMs = 60, startDelay = 0) {
-    elements.forEach((element, index) => {
-      const delay = prefersReducedMotion.matches ? 0 : startDelay + index * intervalMs;
-      window.setTimeout(() => element.classList.add("is-visible"), delay);
+  /**
+   * Cascade-in: stagger add is-visible with an optional start delay.
+   */
+  function cascadeIn(elements, intervalMs = 50, startDelay = 0) {
+    if (prefersReducedMotion.matches) {
+      elements.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+    elements.forEach((el, i) => {
+      window.setTimeout(() => el.classList.add("is-visible"), startDelay + i * intervalMs);
     });
   }
 
-  function cascadeOut(elements, intervalMs = 40) {
-    elements.forEach((element, index) => {
-      const delay = prefersReducedMotion.matches ? 0 : index * intervalMs;
-      window.setTimeout(() => element.classList.remove("is-visible"), delay);
+  /**
+   * Cascade-out: stagger remove is-visible.
+   */
+  function cascadeOut(elements, intervalMs = 30) {
+    if (prefersReducedMotion.matches) {
+      elements.forEach((el) => el.classList.remove("is-visible"));
+      return;
+    }
+    elements.forEach((el, i) => {
+      window.setTimeout(() => el.classList.remove("is-visible"), i * intervalMs);
     });
   }
 
-  function runGlitch(element) {
-    if (!element) {
-      return;
-    }
-    element.classList.remove("glitch-resolve");
-    void element.offsetWidth;
-    element.classList.add("glitch-resolve");
-  }
-
-  function runCABeat(element) {
-    if (!element) {
-      return;
-    }
-    element.classList.remove("ca-beat");
-    void element.offsetWidth;
-    element.classList.add("ca-beat");
-  }
-
-  function runScanline(scanlineElement) {
-    if (!scanlineElement) {
-      return;
-    }
-    scanlineElement.classList.remove("is-active");
-    void scanlineElement.offsetWidth;
-    scanlineElement.classList.add("is-active");
-  }
-
+  /**
+   * Show a bottom-sheet with scrim.
+   */
   function showSheet(sheetElement, scrimElement) {
     if (scrimElement) {
       scrimElement.hidden = false;
@@ -85,6 +55,9 @@ const IRSMotion = (() => {
     requestAnimationFrame(() => sheetElement.classList.add("is-open"));
   }
 
+  /**
+   * Hide a bottom-sheet and conditionally hide scrim.
+   */
   function hideSheet(sheetElement, scrimElement) {
     sheetElement.classList.remove("is-open");
     sheetElement.setAttribute("aria-hidden", "true");
@@ -98,22 +71,25 @@ const IRSMotion = (() => {
     }
   }
 
+  /**
+   * Animate a number from 0 to `toValue` inside `element`.
+   */
   function countUp(element, toValue, options = {}) {
-    const duration = options.duration || 480;
+    const duration = options.duration || 500;
     const decimals = options.decimals || 0;
+
     if (prefersReducedMotion.matches) {
       element.textContent = Number(toValue).toFixed(decimals);
       return;
     }
 
     const start = performance.now();
-    const fromValue = 0;
     const target = Number(toValue);
 
     function tick(now) {
       const progress = Math.min((now - start) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      const value = fromValue + (target - fromValue) * eased;
+      const value = target * eased;
       element.textContent = value.toFixed(decimals);
       if (progress < 1) {
         requestAnimationFrame(tick);
@@ -123,23 +99,49 @@ const IRSMotion = (() => {
     requestAnimationFrame(tick);
   }
 
+  /**
+   * Set up an IntersectionObserver that reveals elements when they enter viewport.
+   */
+  function observeReveals(scope, selector, staggerMs = 50) {
+    const elements = scope.querySelectorAll(selector);
+    if (!elements.length) return;
+
+    if (prefersReducedMotion.matches) {
+      elements.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let delay = 0;
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            window.setTimeout(() => entry.target.classList.add("is-visible"), delay);
+            delay += staggerMs;
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    elements.forEach((el) => observer.observe(el));
+    return observer;
+  }
+
   function onReducedMotionChange(callback) {
     prefersReducedMotion.addEventListener("change", callback);
   }
 
   return {
-    detectTier,
-    applyEnvironment,
+    prefersReducedMotion,
     revealStagger,
     cascadeIn,
     cascadeOut,
-    runGlitch,
-    runCABeat,
-    runScanline,
     showSheet,
     hideSheet,
     countUp,
-    onReducedMotionChange,
-    prefersReducedMotion
+    observeReveals,
+    onReducedMotionChange
   };
 })();

@@ -1,78 +1,96 @@
+/* ================================================================
+   DESIGN SYSTEM — Warm Monochrome Editorial
+   Idea Radar System
+   ================================================================ */
+
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  --bg-base: #090b0f;
-  --bg-secondary: #111318;
-  --surface-1: rgba(23, 26, 33, 0.72);
-  --surface-2: rgba(29, 33, 41, 0.78);
-  --accent-indigo: #7c8cdb;
-  --accent-violet: #94a3ff;
-  --sem-pain: #c97b63;
-  --sem-build: #c7a76b;
-  --sem-momentum: #6ea58b;
-  --text-primary: #f3f5f7;
-  --text-secondary: #b6bcc8;
-  --text-muted: #7d8593;
-  --hairline: rgba(255, 255, 255, 0.06);
-  --hairline-soft: rgba(255, 255, 255, 0.04);
+  /* Canvas & Surfaces */
+  --canvas: #F7F6F3;
+  --canvas-warm: #FBFBFA;
+  --surface: #FFFFFF;
+  --surface-hover: #F9F9F8;
+  --surface-active: #F3F2EF;
 
-  --font-ui: "Outfit", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Structural */
+  --border: #EAEAEA;
+  --border-soft: rgba(0, 0, 0, 0.06);
+  --divider: rgba(0, 0, 0, 0.04);
 
-  --display: 44px;
-  --title-xl: 32px;
-  --title-lg: 28px;
-  --title-md: 22px;
+  /* Typography */
+  --ink: #111111;
+  --ink-secondary: #2F3437;
+  --ink-muted: #787774;
+  --ink-faint: #A8A4A0;
+
+  /* Semantic Pastels — accents only */
+  --accent-red-bg: #FDEBEC;
+  --accent-red: #9F2F2D;
+  --accent-blue-bg: #E1F3FE;
+  --accent-blue: #1F6C9F;
+  --accent-green-bg: #EDF3EC;
+  --accent-green: #346538;
+  --accent-yellow-bg: #FBF3DB;
+  --accent-yellow: #956400;
+  --accent-violet-bg: #EDE9FE;
+  --accent-violet: #5B21B6;
+
+  /* Semantic aliases (used by components) */
+  --sem-pain: #9F2F2D;
+  --sem-pain-bg: #FDEBEC;
+  --sem-build: #956400;
+  --sem-build-bg: #FBF3DB;
+  --sem-momentum: #346538;
+  --sem-momentum-bg: #EDF3EC;
+
+  /* Fonts */
+  --font-ui: 'SF Pro Display', 'Geist Sans', 'Helvetica Neue', 'Switzer', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Lyon Text', 'Newsreader', 'Playfair Display', 'Instrument Serif', Georgia, serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Type Scale */
+  --display: 40px;
+  --title-xl: 30px;
+  --title-lg: 24px;
+  --title-md: 20px;
   --body-lg: 17px;
   --body-md: 16px;
   --body-sm: 15px;
   --label: 13px;
   --caption: 12px;
-  --num-xl: 44px;
-  --num-lg: 28px;
+  --eyebrow: 11px;
+  --num-xl: 40px;
+  --num-lg: 24px;
   --num-md: 14px;
   --num-sm: 11px;
-  --eyebrow: 12px;
 
-  --motion-instant: 120ms;
-  --motion-quick: 180ms;
-  --motion-base: 320ms;
-  --motion-hero: 480ms;
-  --motion-dismiss: 520ms;
+  /* Motion */
+  --motion-instant: 100ms;
+  --motion-quick: 200ms;
+  --motion-base: 400ms;
+  --motion-hero: 600ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
-  --ease-editorial: cubic-bezier(0.2, 0.7, 0.1, 1);
-  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-in-soft: cubic-bezier(0.7, 0, 0.84, 0);
-
-  --spring-ui: cubic-bezier(0.25, 0.9, 0.32, 1.06);
-  --spring-hero: cubic-bezier(0.22, 0.9, 0.22, 1.02);
-  --spring-pull: cubic-bezier(0.25, 0.82, 0.25, 1.2);
-
-  --stagger-base: 60ms;
-  --stagger-dense: 40ms;
-  --stagger-exit: 40ms;
-
-  --z-backdrop: 0;
+  /* Z-index */
   --z-content: 1;
-  --z-nav: 2;
-  --z-overlay: 3;
-  --z-toast: 4;
+  --z-nav: 10;
+  --z-overlay: 20;
+  --z-toast: 30;
 
-  --gutter: 20px;
-  --card-radius: 16px;
+  /* Spacing */
+  --gutter: 24px;
+  --card-radius: 8px;
   --tap-min: 44px;
-
-  --effects-strength: 1;
-  --drift-enabled: 1;
-  --grain-enabled: 1;
-  --ca-max: 1.5px;
-  --scanline-enabled: 1;
+  --section-gap: 64px;
 }
 
-*,
-*::before,
-*::after {
+/* ---- Reset ---- */
+*, *::before, *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
@@ -84,26 +102,19 @@ html {
 }
 
 body {
-  margin: 0;
   min-height: 100dvh;
   font-family: var(--font-ui);
-  line-height: 1.5;
-  color: var(--text-primary);
-  background: var(--bg-base);
+  font-size: var(--body-md);
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--canvas);
   overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
 }
 
-img,
-svg {
-  display: block;
-  max-width: 100%;
-}
+img, svg { display: block; max-width: 100%; }
 
-button,
-input,
-select,
-textarea {
+button, input, select, textarea {
   font: inherit;
   color: inherit;
 }
@@ -111,79 +122,47 @@ textarea {
 button {
   border: 0;
   background: transparent;
-  padding: 0;
   cursor: pointer;
-}
-
-button,
-input,
-textarea,
-select {
   touch-action: manipulation;
 }
 
-a {
-  color: inherit;
+input, textarea, select { touch-action: manipulation; }
+
+a { color: inherit; text-decoration: none; }
+
+h1, h2, h3, h4, h5, p { margin: 0; }
+
+ul, ol { list-style: none; }
+
+/* ---- Focus ---- */
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
-h1,
-h2,
-h3,
-h4,
-p {
-  margin: 0;
-}
-
+/* ---- Skip Link ---- */
 .skip-link {
   position: absolute;
   left: 12px;
   top: -120px;
   z-index: 999;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: var(--surface-2);
-  color: var(--text-primary);
+  padding: 8px 16px;
+  background: var(--ink);
+  color: var(--surface);
+  font-size: var(--label);
+  font-weight: 600;
+  border-radius: 4px;
   text-decoration: none;
-  transition: top var(--motion-quick) var(--ease-editorial);
+  transition: top var(--motion-quick) var(--ease-out);
 }
 
 .skip-link:focus {
   top: 12px;
 }
 
-:focus-visible {
-  outline: 2px solid rgba(148, 163, 255, 0.6);
-  outline-offset: 2px;
-}
-
-.ambient-layer {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: var(--z-backdrop);
-}
-
-.ambient-base {
-  background: var(--bg-base);
-}
-
-.ambient-drift {
-  background: radial-gradient(
-    75% 60% at var(--drift-x, 30%) var(--drift-y, 30%),
-    rgba(124, 140, 219, calc(0.06 * var(--effects-strength) * var(--drift-enabled))) 0%,
-    rgba(124, 140, 219, 0) 70%
-  );
-  animation: driftCycle 24s ease-in-out infinite alternate;
-}
-
-.ambient-grain {
-  opacity: calc(0.04 * var(--grain-enabled));
-  background-image: radial-gradient(rgba(243, 245, 247, 0.16) 0.4px, transparent 0.4px);
-  background-size: 3px 3px;
-  mix-blend-mode: overlay;
-}
-
-.screen-reader-only {
+/* ---- Screen Reader Only ---- */
+.sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -192,79 +171,34 @@ p {
   border: 0;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 
-[data-tier="low"] {
-  --effects-strength: 0.65;
-  --drift-enabled: 0;
-  --grain-enabled: 0;
-  --scanline-enabled: 0;
-  --ca-max: 0px;
+/* ---- Selection ---- */
+::selection {
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue);
 }
 
-[data-tier="high"] {
-  --effects-strength: 1;
-  --drift-enabled: 1;
-  --grain-enabled: 1;
-  --scanline-enabled: 1;
-  --ca-max: 2px;
+/* ---- Scrollbar (WebKit) ---- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-[data-effects="off"] {
-  --effects-strength: 0;
-  --drift-enabled: 0;
-  --grain-enabled: 0;
-  --scanline-enabled: 0;
-  --ca-max: 0px;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-[data-effects="subtle"] {
-  --effects-strength: 0.8;
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
 }
 
-[data-reduced-motion="true"] {
-  --motion-instant: 0ms;
-  --motion-quick: 0ms;
-  --motion-base: 0ms;
-  --motion-hero: 0ms;
-  --motion-dismiss: 0ms;
-  --stagger-base: 0ms;
-  --stagger-dense: 0ms;
-  --stagger-exit: 0ms;
-  --drift-enabled: 0;
-  --scanline-enabled: 0;
-  --ca-max: 0px;
-}
-
-@media (min-width: 1024px) {
-  :root {
-    --gutter: 24px;
-  }
-}
-
+/* ---- Reduced Motion ---- */
 @media (prefers-reduced-motion: reduce) {
-  :root {
-    --motion-instant: 0ms;
-    --motion-quick: 0ms;
-    --motion-base: 0ms;
-    --motion-hero: 0ms;
-    --motion-dismiss: 0ms;
-    --stagger-base: 0ms;
-    --stagger-dense: 0ms;
-    --stagger-exit: 0ms;
-    --drift-enabled: 0;
-    --scanline-enabled: 0;
-    --ca-max: 0px;
-  }
-}
-
-@keyframes driftCycle {
-  0% {
-    --drift-x: 30%;
-    --drift-y: 28%;
-  }
-  100% {
-    --drift-x: 68%;
-    --drift-y: 24%;
+  *, *::before, *::after {
+    animation-duration: 0ms !important;
+    transition-duration: 0ms !important;
   }
 }
