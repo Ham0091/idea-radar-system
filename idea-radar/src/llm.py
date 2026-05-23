@@ -53,7 +53,11 @@ class LLMClient:
         for attempt in range(retries + 1):
             try:
                 response = self._post(request_body)
-                content = response["choices"][0]["message"]["content"]
+                message = response["choices"][0]["message"]
+                content = message.get("content") or ""
+                # Fallback to reasoning_content if content is empty (reasoning models)
+                if not content.strip() and message.get("reasoning_content"):
+                    content = message["reasoning_content"]
                 self.logger.info("Raw LLM response: %s", content)
                 return safe_json_loads(content), response.get("usage", {})
             except Exception as exc:
