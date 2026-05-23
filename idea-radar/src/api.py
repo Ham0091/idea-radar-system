@@ -10,6 +10,9 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 sys.path.insert(0, str(Path(__file__).parent))
 
 import config
+from utils import load_env_file
+load_env_file(config.BASE_DIR)
+
 import scorer
 from telegram_scheduler import record_request_server_url, start_daily_scheduler
 from storage import (
