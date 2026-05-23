@@ -16,6 +16,7 @@ const IRSState = (() => {
     loading: true,
     error: null,
     appearance: "default",
+    theme: "vectorpunk",
     reducedMotionOverride: false,
     moversRange: "24h",
     explore: {

@@ -246,42 +246,46 @@ const IRSComponents = (() => {
     var composite = rankScore(idea);
     var summary = firstSentence(idea.description);
     var fmt = inferProjectFormat(idea);
-    var pitch = buildPitch(idea);
     var points = dailySignalSeries(detail, idea.recent_signal_count);
     var sparkline = sparklinePath(points);
     var signalsTotal = Number(idea.signal_count || (detail && detail.signals && detail.signals.length) || 0);
     var sourcesCount = Number(idea.recent_signal_count || 0);
+    var specimen = rank > 0 && rank % 4 === 1 ? " is-specimen" : "";
+    var offset = rank > 0 && rank % 2 === 0 ? " is-offset" : "";
 
-    return '<article class="signal-card" data-idea-id="' + escapeHtml(idea.id) + '" data-rank="' + rank + '" tabindex="' + tabIndex + '">' +
-      '<div class="eyebrow-row">' +
-        '<span class="format-chip">' + escapeHtml(fmt.toUpperCase()) + '</span>' +
-        '<span>' + escapeHtml(chapterTitle(chapter).toUpperCase()) + ' \u00b7 ' + escapeHtml(formatAge(idea.created_at || idea.last_signal_at)) + ' \u00b7 ' + sourcesCount + ' sources</span>' +
+    return '<article class="signal-card opportunity-cell' + specimen + offset + '" data-idea-id="' + escapeHtml(idea.id) + '" data-rank="' + rank + '" tabindex="' + tabIndex + '" style="--cell-accent:' + dominant.css + '">' +
+      '<div class="score-rail">' +
+        '<span class="rail-rank">' + (rank ? "#" + rank : "ID") + '</span>' +
+        '<span class="rail-score count-up" data-count-target="' + composite.toFixed(1) + '">' + composite.toFixed(1) + '</span>' +
       '</div>' +
-      '<h3 class="signal-title">' + escapeHtml(idea.title) + '</h3>' +
-      '<p class="build-pitch">' + escapeHtml(pitch) + '</p>' +
-      '<p class="signal-summary">' + escapeHtml(summary) + '</p>' +
-      '<div class="score-strip">' +
-        '<span class="score-composite count-up" data-count-target="' + composite.toFixed(1) + '" style="color:' + dominant.css + '">' + composite.toFixed(1) + '</span>' +
-        '<div class="score-subscores">' +
-          '<span class="score-sub">P ' + scoreText(idea.pain) + '</span>' +
-          '<span class="score-sub">B ' + scoreText(idea.buildability) + '</span>' +
+      '<div class="cell-body">' +
+        '<div class="cell-meta">' +
+          '<span class="format-chip">' + escapeHtml(fmt) + '</span>' +
+          '<span>' + escapeHtml(chapterTitle(chapter)) + '</span>' +
+          '<span>' + escapeHtml(formatAge(idea.created_at || idea.last_signal_at)) + '</span>' +
+          (sourcesCount > 0 ? '<span class="signal-bead">' + sourcesCount + '</span>' : "") +
+        '</div>' +
+        '<h3 class="signal-title">' + escapeHtml(idea.title) + '</h3>' +
+        '<p class="signal-summary">' + escapeHtml(summary) + '</p>' +
+        '<div class="keyword-row">' + keywordChips(idea, specimen ? 5 : 3) + '</div>' +
+        (specimen ? '<div class="specimen-evidence"><span>why now</span><p>' + escapeHtml(firstSentence(idea.why_now || idea.mvp_scope || idea.description)) + '</p></div>' : "") +
+        '<div class="sparkline-wrap">' +
+          '<svg class="sparkline" viewBox="0 0 320 28" preserveAspectRatio="none" role="img" aria-label="Momentum over 14 days">' +
+            '<path class="sparkline-line" d="' + sparkline + '" style="stroke:' + dominant.css + '"></path>' +
+          '</svg>' +
+        '</div>' +
+        '<div class="metadata-footer">' +
+          '<button class="metadata-toggle" type="button" aria-expanded="false">' +
+            signalsTotal + ' signals / last seen ' + escapeHtml(relativeTime(idea.last_signal_at || idea.updated_at)) +
+          '</button>' +
+          '<div class="metadata-expanded" hidden>' +
+            '<span>Novelty ' + scoreText(idea.novelty) + ' / Buildability ' + scoreText(idea.buildability) + '</span>' +
+            '<span>Computed ' + scoreText(idea.computed_score) + ' / Override ' + (idea.user_score == null ? "none" : scoreText(idea.user_score)) + '</span>' +
+            '<span>Status ' + escapeHtml(idea.user_status || "active") + '</span>' +
+          '</div>' +
         '</div>' +
       '</div>' +
-      '<div class="sparkline-wrap">' +
-        '<svg class="sparkline" viewBox="0 0 320 28" preserveAspectRatio="none" role="img" aria-label="Momentum over 14 days">' +
-          '<path class="sparkline-line" d="' + sparkline + '" style="stroke:' + dominant.css + '"></path>' +
-        '</svg>' +
-      '</div>' +
-      '<div class="metadata-footer">' +
-        '<button class="metadata-toggle" type="button" aria-expanded="false">' +
-          signalsTotal + ' signals \u00b7 last seen ' + escapeHtml(relativeTime(idea.last_signal_at || idea.updated_at)) +
-        '</button>' +
-        '<div class="metadata-expanded" hidden>' +
-          '<span>Novelty ' + scoreText(idea.novelty) + ' \u00b7 Buildability ' + scoreText(idea.buildability) + '</span>' +
-          '<span>Computed ' + scoreText(idea.computed_score) + ' \u00b7 Override ' + (idea.user_score == null ? "none" : scoreText(idea.user_score)) + '</span>' +
-          '<span>Status ' + escapeHtml(idea.user_status || "active") + '</span>' +
-        '</div>' +
-      '</div>' +
+      '<div class="cell-plot">' + miniPlot(idea) + '</div>' +
     '</article>';
   }
 
@@ -295,6 +299,26 @@ const IRSComponents = (() => {
       '<p class="compact-summary">' + escapeHtml(firstSentence(idea.description)) + '</p>' +
       '<div class="compact-score">' + scoreText(rankScore(idea)) + '</div>' +
     '</article>';
+  }
+
+  function miniPlot(idea) {
+    var values = [
+      { key: "pain", label: "P", value: score(idea.pain), color: "var(--sem-pain)" },
+      { key: "novelty", label: "N", value: score(idea.novelty), color: "var(--sem-novelty)" },
+      { key: "build", label: "B", value: score(idea.buildability), color: "var(--sem-build)" }
+    ];
+    return '<div class="mini-plot" aria-label="Pain novelty build score plot">' +
+      values.map(function (item) {
+        var h = Math.max(18, Math.min(100, item.value * 10));
+        return '<span class="mini-plot-bar ' + item.key + '" style="--plot-height:' + h.toFixed(0) + '%;--plot-color:' + item.color + '" title="' + item.label + ' ' + scoreText(item.value) + '"><i></i><b>' + item.label + '</b></span>';
+      }).join("") +
+      '</div>';
+  }
+
+  function keywordChips(idea, limit) {
+    return parseJsonList(idea.keywords).slice(0, limit || 3).map(function (k) {
+      return '<span class="keyword-chip">' + escapeHtml(k) + '</span>';
+    }).join("");
   }
 
   /* ---- Movers Card ---- */
@@ -341,6 +365,58 @@ const IRSComponents = (() => {
     '</div>';
   }
 
+  function scoreConstellation(idea) {
+    var metrics = [
+      { key: "pain", label: "Pain", value: score(idea.pain), angle: -90, color: "var(--sem-pain)" },
+      { key: "novelty", label: "Novelty", value: score(idea.novelty), angle: 0, color: "var(--sem-novelty)" },
+      { key: "build", label: "Build", value: score(idea.buildability), angle: 90, color: "var(--sem-build)" },
+      { key: "open", label: "Open", value: Math.max(0, 10 - score(idea.saturation)), angle: 180, color: "var(--sem-momentum)" }
+    ];
+    var cx = 100;
+    var cy = 100;
+    var points = metrics.map(function (m) {
+      var radius = 22 + (Math.max(0, Math.min(m.value, 10)) / 10) * 52;
+      var radians = (m.angle - 90) * Math.PI / 180;
+      return Object.assign({}, m, {
+        x: cx + Math.cos(radians) * radius,
+        y: cy + Math.sin(radians) * radius
+      });
+    });
+    var polygon = points.map(function (p) { return p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ");
+    return '<div class="score-constellation">' +
+      '<svg viewBox="0 0 200 200" role="img" aria-label="Score constellation">' +
+        '<path class="constellation-diamond" d="M100 24 L176 100 L100 176 L24 100 Z"></path>' +
+        '<polygon class="constellation-poly" points="' + polygon + '"></polygon>' +
+        points.map(function (p) {
+          return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="6" style="--dot-color:' + p.color + '"></circle>';
+        }).join("") +
+      '</svg>' +
+      '<div class="constellation-labels">' + metrics.map(function (m) {
+        return '<span><b>' + escapeHtml(m.label) + '</b><i>' + scoreText(m.value) + '</i></span>';
+      }).join("") + '</div>' +
+    '</div>';
+  }
+
+  function evidenceLanes(signals) {
+    var list = Array.isArray(signals) ? signals : [];
+    var latest = list.slice(0, 8);
+    var sources = list.slice(0, 8);
+    var phrases = list.filter(function (s) { return s.text; }).slice(0, 8);
+    function lane(title, items, mapper) {
+      if (!items.length) return "";
+      return '<section class="inspect-section evidence-lane"><h3 class="eyebrow-row"><span>' + escapeHtml(title) + '</span></h3><div class="evidence-strip">' +
+        items.map(mapper).join("") +
+      '</div></section>';
+    }
+    return lane("latest signals", latest, function (s) {
+      return '<article class="evidence-ticket"><span>' + escapeHtml(formatDate(s.timestamp)) + '</span><b>' + escapeHtml(s.source || "source") + '</b><p>' + escapeHtml(String(s.text || s.summary || "").slice(0, 170)) + '</p></article>';
+    }) + lane("pain phrases", phrases, function (s) {
+      return '<article class="evidence-ticket is-phrase"><span>phrase</span><p>' + escapeHtml(String(s.text).slice(0, 150)) + '</p></article>';
+    }) + lane("source links", sources, function (s) {
+      return '<article class="evidence-ticket is-source"><span>' + escapeHtml(s.source || "source") + '</span><p>' + escapeHtml(s.url || s.link || "No source URL stored") + '</p></article>';
+    });
+  }
+
   /* ---- Inspect Detail View ---- */
 
   function inspectView(opts) {
@@ -353,13 +429,6 @@ const IRSComponents = (() => {
     var signals = Array.isArray(detail && detail.signals) ? detail.signals : [];
     var whyNow = idea.why_now ? String(idea.why_now).trim() : "";
     var mvpItems = String(idea.mvp_scope || "").split(/\n|\u2022|-/).map(function (s) { return s.trim(); }).filter(function (s) { return s.length > 0; }).slice(0, 6);
-
-    var excerpts = signals.filter(function (s) { return s.text; }).slice(0, 5).map(function (s) {
-      return '<article>' +
-        '<p class="source-quote">' + escapeHtml(String(s.text).slice(0, 240)) + '</p>' +
-        '<p class="source-attribution">' + escapeHtml((s.source || "SOURCE").toUpperCase()) + ' \u00b7 ' + escapeHtml(formatDate(s.timestamp)) + '</p>' +
-      '</article>';
-    }).join("");
 
     var timelineChips = signals.slice(0, 10).map(function (s) {
       return '<span class="timeline-chip">' + escapeHtml(formatDate(s.timestamp)) + '</span>';
@@ -377,11 +446,12 @@ const IRSComponents = (() => {
     var html = '';
 
     // Header
-    html += '<article class="inspect-header">';
-    html += '<span class="format-chip">' + escapeHtml(fmt.toUpperCase()) + '</span>';
+    html += '<article class="inspect-header lens-header" style="--cell-accent:' + dominant.css + '">';
+    html += '<div class="lens-gauge"><span class="count-up" data-count-target="' + composite.toFixed(1) + '">' + composite.toFixed(1) + '</span><small>rank</small></div>';
+    html += '<span class="format-chip">' + escapeHtml(fmt) + '</span>';
     html += '<h2 class="inspect-title">' + escapeHtml(idea.title) + '</h2>';
     html += '<p class="build-pitch">' + escapeHtml(pitch) + '</p>';
-    html += '<p class="inspect-score count-up" data-count-target="' + composite.toFixed(1) + '" style="color:' + dominant.css + '">' + composite.toFixed(1) + '</p>';
+    html += '<div class="lens-meta"><span>' + signals.length + ' signals</span><span>' + escapeHtml(relativeTime(idea.last_signal_at || idea.updated_at)) + '</span><span>' + escapeHtml((idea.user_status || "active").toUpperCase()) + '</span></div>';
     html += '<div class="inspect-band" style="background:' + dominant.css + '"></div>';
     html += '</article>';
 
@@ -395,7 +465,7 @@ const IRSComponents = (() => {
     // Signal Timeline
     if (signals.length) {
       html += '<section class="inspect-section">';
-      html += '<h3 class="eyebrow-row"><span>SIGNAL TIMELINE</span></h3>';
+      html += '<h3 class="eyebrow-row"><span>signal trace</span></h3>';
       html += '<div class="sparkline-wrap" style="margin-top:14px"><svg class="sparkline" viewBox="0 0 320 88" preserveAspectRatio="none" role="img" aria-label="Signal timeline momentum"><path class="sparkline-line" d="' + timelinePath + '" style="stroke:' + dominant.css + '"></path></svg></div>';
       html += '<div class="timeline-chips">' + timelineChips + '</div>';
       html += '</section>';
@@ -403,25 +473,21 @@ const IRSComponents = (() => {
 
     // Score Composition
     html += '<section class="inspect-section">';
-    html += '<h3 class="eyebrow-row"><span>SCORE COMPOSITION</span></h3>';
-    html += '<div class="score-bars" style="margin-top:16px">';
+    html += '<h3 class="eyebrow-row"><span>score constellation</span></h3>';
+    html += scoreConstellation(idea);
+    html += '<div class="score-bars compact-meters" style="margin-top:16px">';
     html += scoreBarRow("Pain", idea.pain, "var(--sem-pain)");
-    html += scoreBarRow("Momentum", Math.min(10, idea.recent_signal_count || 0), "var(--sem-momentum)");
+    html += scoreBarRow("Novelty", idea.novelty, "var(--sem-novelty)");
     html += scoreBarRow("Build", idea.buildability, "var(--sem-build)");
     html += '</div></section>';
 
     // Source Excerpts
-    if (excerpts) {
-      html += '<section class="inspect-section">';
-      html += '<h3 class="eyebrow-row"><span>SOURCE EXCERPTS</span></h3>';
-      html += '<div class="source-list" style="margin-top:16px">' + excerpts + '</div>';
-      html += '</section>';
-    }
+    html += evidenceLanes(signals);
 
     // MVP Scope
     if (mvpItems.length) {
       html += '<section class="inspect-section">';
-      html += '<h3 class="eyebrow-row"><span>MVP SCOPE</span></h3>';
+      html += '<h3 class="eyebrow-row"><span>mvp scope</span></h3>';
       html += '<ul class="mvp-list" style="margin-top:14px">';
       html += mvpItems.map(function (item) { return '<li>' + escapeHtml(item) + '</li>'; }).join("");
       html += '</ul></section>';
@@ -430,7 +496,7 @@ const IRSComponents = (() => {
     // Related Ideas
     if (relatedCards) {
       html += '<section class="inspect-section">';
-      html += '<h3 class="eyebrow-row"><span>RELATED IDEAS</span></h3>';
+      html += '<h3 class="eyebrow-row"><span>nearby vectors</span></h3>';
       html += '<div class="related-row" style="margin-top:14px">' + relatedCards + '</div>';
       html += '</section>';
     }
@@ -450,6 +516,7 @@ const IRSComponents = (() => {
     var sources = opts.sources;
     var appearance = opts.appearance;
     var reducedMotion = opts.reducedMotion;
+    var theme = opts.theme || "vectorpunk";
 
     var sourceRows = sources.map(function (s) {
       var isOn = Number(s.enabled) === 1;
@@ -482,6 +549,13 @@ const IRSComponents = (() => {
       '</section>' +
       '<section class="settings-group">' +
         '<h3>Appearance</h3>' +
+        '<div class="settings-row">' +
+          '<span>Theme</span>' +
+          '<div class="chip-scroll">' +
+            '<button class="chip ' + (theme === "vectorpunk" || theme === "vectorheart" ? "is-active" : "") + '" type="button" data-theme-option="vectorpunk">Vectorheart</button>' +
+            '<button class="chip ' + (theme === "editorial" ? "is-active" : "") + '" type="button" data-theme-option="editorial">Low ink</button>' +
+          '</div>' +
+        '</div>' +
         '<div class="settings-row">' +
           '<span>Reduced motion override</span>' +
           '<button class="toggle ' + (reducedMotion ? "is-on" : "") + '" type="button" data-settings-toggle="reduced-motion" aria-pressed="' + (reducedMotion ? "true" : "false") + '"></button>' +

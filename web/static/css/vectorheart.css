@@ -1,0 +1,357 @@
+/* ================================================================
+   VECTORHEART — Theme-specific structural overrides
+   Applied when data-theme="vectorheart" is on <html>
+   ================================================================ */
+
+/* ---- Top Bar ---- */
+[data-theme="vectorheart"] .top-bar {
+  background: rgba(10, 12, 16, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="vectorheart"] .app-mark {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+/* ---- Bottom Nav ---- */
+[data-theme="vectorheart"] .bottom-nav {
+  background: rgba(10, 12, 16, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="vectorheart"] .nav-item.is-active {
+  color: var(--accent-blue, #6b7cdb);
+}
+
+[data-theme="vectorheart"] .nav-item.is-active .nav-label {
+  color: var(--accent-blue, #6b7cdb);
+}
+
+[data-theme="vectorheart"] .nav-dot {
+  background: var(--accent-blue, #6b7cdb);
+}
+
+/* ---- View Header ---- */
+[data-theme="vectorheart"] .view-title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+[data-theme="vectorheart"] .view-kicker {
+  color: var(--accent-blue, #6b7cdb);
+}
+
+/* ---- Signal Card ---- */
+[data-theme="vectorheart"] .signal-card {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--surface, #10131a);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grid overlay on cards */
+[data-theme="vectorheart"] .signal-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(120, 140, 180, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 140, 180, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  z-index: 0;
+}
+
+[data-theme="vectorheart"] .signal-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+[data-theme="vectorheart"] .signal-card:hover {
+  border-color: rgba(107, 124, 219, 0.25);
+  box-shadow: 0 0 0 1px rgba(107, 124, 219, 0.1);
+}
+
+[data-theme="vectorheart"] .signal-card.is-focused,
+[data-theme="vectorheart"] .signal-card:focus-visible {
+  border-color: rgba(107, 124, 219, 0.4);
+  box-shadow: 0 0 0 2px rgba(107, 124, 219, 0.15);
+}
+
+/* ---- Card Typography ---- */
+[data-theme="vectorheart"] .signal-title {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+[data-theme="vectorheart"] .chapter-divider-title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* ---- Eyebrow Row ---- */
+[data-theme="vectorheart"] .eyebrow-row {
+  color: var(--ink-muted, #5c6370);
+}
+
+/* ---- Format Chip ---- */
+[data-theme="vectorheart"] .format-chip {
+  background: rgba(107, 124, 219, 0.10);
+  border-color: rgba(107, 124, 219, 0.20);
+  color: var(--accent-blue, #6b7cdb);
+}
+
+/* ---- Score Strip ---- */
+[data-theme="vectorheart"] .score-subscores {
+  border-left-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Sparkline ---- */
+[data-theme="vectorheart"] .sparkline-line.dimmed {
+  opacity: 0.15;
+}
+
+/* ---- Inspect Panel ---- */
+[data-theme="vectorheart"] .inspect-panel {
+  background: var(--canvas, #0a0c10);
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="vectorheart"] .inspect-title {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+[data-theme="vectorheart"] .inspect-section {
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Section Headers (Vectorheart bracket style) ---- */
+[data-theme="vectorheart"] .eyebrow-row span:first-child::before {
+  content: "[ ";
+  color: var(--ink-faint, #3a3f4a);
+}
+
+[data-theme="vectorheart"] .eyebrow-row span:first-child::after {
+  content: " ]";
+  color: var(--ink-faint, #3a3f4a);
+}
+
+/* ---- Sheet ---- */
+[data-theme="vectorheart"] .sheet {
+  background: var(--surface, #10131a);
+  border-color: rgba(255, 255, 255, 0.06);
+  border-bottom: 0;
+}
+
+[data-theme="vectorheart"] .sheet-heading {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="vectorheart"] .settings-group h3 {
+  color: var(--accent-blue, #6b7cdb);
+}
+
+[data-theme="vectorheart"] .settings-group {
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Toggle ---- */
+[data-theme="vectorheart"] .toggle {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="vectorheart"] .toggle::after {
+  background: var(--ink-muted, #5c6370);
+}
+
+[data-theme="vectorheart"] .toggle.is-on {
+  border-color: var(--accent-blue, #6b7cdb);
+  background: var(--accent-blue, #6b7cdb);
+}
+
+/* ---- Buttons ---- */
+[data-theme="vectorheart"] .btn-primary {
+  background: var(--accent-blue, #6b7cdb);
+  border-radius: 2px;
+}
+
+[data-theme="vectorheart"] .btn-primary:hover {
+  background: #5a6cc8;
+}
+
+[data-theme="vectorheart"] .view-action.is-primary {
+  background: var(--accent-blue, #6b7cdb);
+  border-color: var(--accent-blue, #6b7cdb);
+}
+
+[data-theme="vectorheart"] .view-action.is-primary:hover {
+  background: #5a6cc8;
+}
+
+/* ---- Chips & Segmented ---- */
+[data-theme="vectorheart"] .chip.is-active {
+  border-color: var(--accent-blue, #6b7cdb);
+  color: var(--accent-blue, #6b7cdb);
+  background: rgba(107, 124, 219, 0.08);
+}
+
+[data-theme="vectorheart"] .segmented button.is-active {
+  background: var(--accent-blue, #6b7cdb);
+  color: #0a0c10;
+}
+
+[data-theme="vectorheart"] .segmented {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="vectorheart"] .segmented button {
+  border-right-color: rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Filter Row ---- */
+[data-theme="vectorheart"] .filter-row {
+  background: rgba(10, 12, 16, 0.92);
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Scrim ---- */
+[data-theme="vectorheart"] .scrim {
+  background: rgba(5, 6, 8, 0.6);
+}
+
+/* ---- Toast ---- */
+[data-theme="vectorheart"] .toast {
+  background: var(--surface, #10131a);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ---- Mover Card ---- */
+[data-theme="vectorheart"] .mover-delta.up { color: #5a9e78; }
+[data-theme="vectorheart"] .mover-delta.down { color: #d4715a; }
+
+/* ---- Score Bars ---- */
+[data-theme="vectorheart"] .score-bar-track {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Source Quotes ---- */
+[data-theme="vectorheart"] .source-quote {
+  border-left: 2px solid rgba(107, 124, 219, 0.3);
+  padding-left: 12px;
+}
+
+/* ---- MVP List ---- */
+[data-theme="vectorheart"] .mvp-list li::before {
+  background: var(--accent-blue, #6b7cdb);
+}
+
+/* ---- Loading / Skeleton ---- */
+[data-theme="vectorheart"] .skeleton-line,
+[data-theme="vectorheart"] .skeleton-pill {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="vectorheart"] .skeleton-line::after,
+[data-theme="vectorheart"] .skeleton-pill::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04), transparent);
+}
+
+[data-theme="vectorheart"] .loading-card {
+  border-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Pipeline / System ---- */
+[data-theme="vectorheart"] .pipeline-card {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="vectorheart"] .failure-row {
+  border-left-color: #d4715a;
+}
+
+/* ---- Compact Card ---- */
+[data-theme="vectorheart"] .compact-card {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="vectorheart"] .compact-card:hover {
+  border-color: rgba(107, 124, 219, 0.25);
+}
+
+/* ---- Empty State ---- */
+[data-theme="vectorheart"] .empty-state {
+  border-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Metadata ---- */
+[data-theme="vectorheart"] .metadata-footer {
+  border-top-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Timeline Chips ---- */
+[data-theme="vectorheart"] .timeline-chip {
+  border-color: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ---- Scroll Progress ---- */
+[data-theme="vectorheart"] .scroll-progress {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="vectorheart"] .scroll-progress-fill {
+  background: var(--accent-blue, #6b7cdb);
+}
+
+/* ---- Sheet Input ---- */
+[data-theme="vectorheart"] .sheet-input {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="vectorheart"] .sheet-input:focus {
+  border-color: var(--accent-blue, #6b7cdb);
+}
+
+/* ---- View Actions ---- */
+[data-theme="vectorheart"] .view-action {
+  border-color: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="vectorheart"] .view-action:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ---- Related Cards ---- */
+[data-theme="vectorheart"] .related-card {
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="vectorheart"] .related-card:hover {
+  border-color: rgba(107, 124, 219, 0.25);
+}
+
+/* ---- Profile Chip ---- */
+[data-theme="vectorheart"] .profile-chip {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="vectorheart"] .profile-chip:hover {
+  border-color: rgba(107, 124, 219, 0.3);
+}

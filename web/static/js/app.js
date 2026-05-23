@@ -26,7 +26,8 @@
     sortSheet: $("#sortSheet"),
     searchSheet: $("#searchSheet"),
     toastStack: $("#toastStack"),
-    scrollProgressFill: $("#scrollProgressFill")
+    scrollProgressFill: $("#scrollProgressFill"),
+    themeColorMeta: document.getElementById("themeColorMeta")
   };
 
   var exploreObserver = null;
@@ -37,6 +38,17 @@
 
   function nowIso() {
     return new Date().toISOString();
+  }
+
+  function applyTheme(theme) {
+    if (theme === "vectorpunk" || theme === "vectorheart") {
+      document.documentElement.setAttribute("data-theme", "vectorpunk");
+      if (dom.themeColorMeta) dom.themeColorMeta.setAttribute("content", "#f7f8ff");
+    } else {
+      document.documentElement.setAttribute("data-theme", "editorial");
+      if (dom.themeColorMeta) dom.themeColorMeta.setAttribute("content", "#f2ecdf");
+    }
+    try { localStorage.setItem("irs-theme", theme); } catch (e) { /* ignore */ }
   }
 
   function computeMomentumDelta(idea, windowDays) {
@@ -124,8 +136,8 @@
     if (!top10.length) {
       dom.viewRadar.innerHTML =
         '<header class="view-header">' +
-          '<div class="view-kicker">Daily snapshot</div>' +
-          '<h1 class="view-title">Radar</h1>' +
+          '<div class="view-kicker">Vectorheart field unit</div>' +
+          '<h1 class="view-title">Signal field</h1>' +
           '<p class="view-subtitle">Loading opportunities from the pipeline.</p>' +
         '</header>' +
         IRSComponents.loadingState("Loading radar", "Pulling in the newest ideas and arranging the feed.");
@@ -154,14 +166,17 @@
     });
 
     dom.viewRadar.innerHTML =
-      '<header class="view-header">' +
-        '<div class="view-kicker">Daily snapshot</div>' +
-        '<h1 class="view-title">Radar</h1>' +
-        '<p class="view-subtitle">' + top10.length + ' opportunities in active rotation</p>' +
+      '<header class="view-header field-head">' +
+        '<div>' +
+          '<div class="view-kicker">Vectorheart field unit</div>' +
+          '<h1 class="view-title">Signal field</h1>' +
+          '<p class="view-subtitle">' + top10.length + ' opportunities plotted for thumb scan</p>' +
+        '</div>' +
+        '<div class="field-dial" aria-hidden="true"><span>' + top10.length + '</span><small>LIVE</small></div>' +
       '</header>' +
       IRSComponents.viewActions([
         { id: "open-search", label: "Search" },
-        { id: "switch-explore", label: "Explore" },
+        { id: "switch-explore", label: "Build queue" },
         { id: "refresh", label: "Refresh", variant: "is-primary" },
         { id: "open-settings", label: "Settings" }
       ]) +
@@ -199,8 +214,9 @@
 
     dom.viewMovers.innerHTML =
       '<header class="view-header">' +
+        '<div class="view-kicker">Rank current</div>' +
         '<h1 class="view-title">Movers</h1>' +
-        '<p class="view-subtitle">Rising momentum opportunities by time window.</p>' +
+        '<p class="view-subtitle">Momentum traces from the latest signal windows.</p>' +
       '</header>' +
       '<div class="segmented" role="tablist" aria-label="Movers time range">' +
         '<button type="button" role="tab" aria-selected="' + (range === "24h") + '" class="' + (range === "24h" ? "is-active" : "") + '" data-range="24h">24h</button>' +
@@ -228,7 +244,7 @@
   /* ---- Render: Explore ---- */
 
   function renderExplore() {
-    var ideas = IRSState.get("ideas");
+    var ideas = IRSState.get("ideas").filter(function (idea) { return idea.user_status === "building"; });
     var explore = IRSState.get("explore");
     var filtered = applyExploreFilters(sortIdeasForExplore(ideas, explore.sort), explore.activeFilters);
     var rendered = filtered.slice(0, explore.page * PAGE_SIZE);
@@ -253,9 +269,9 @@
 
     dom.viewExplore.innerHTML =
       '<header class="view-header">' +
-        '<div class="view-kicker">Catalog</div>' +
-        '<h1 class="view-title">Explore</h1>' +
-        '<p class="view-subtitle">Browse and filter opportunity space.</p>' +
+        '<div class="view-kicker">Work bench</div>' +
+        '<h1 class="view-title">Build queue</h1>' +
+        '<p class="view-subtitle">Ideas already marked for build, grouped for next useful action.</p>' +
       '</header>' +
       IRSComponents.viewActions([
         { id: "open-search", label: "Search" },
@@ -263,7 +279,7 @@
         { id: "clear-filters", label: explore.activeFilters.length ? "Clear filters" : "Filters" }
       ]) +
       '<div class="filter-row"><div class="chip-scroll">' + chips + '</div></div>' +
-      '<section class="explore-grid">' + cards + '</section>' +
+      '<section class="explore-grid build-queue">' + (cards || IRSComponents.emptyState("No build queue yet.", "Save an opportunity from the field lens and it will land here.")) + '</section>' +
       (hasMore ? '<div class="loading-line" id="exploreSentinel" aria-hidden="true"></div>' : "");
 
     $$(".chip[data-filter-chip]", dom.viewExplore).forEach(function (chip) {
@@ -287,6 +303,9 @@
     var sources = IRSState.get("sources");
     var runs = IRSState.get("runs");
     var stats = IRSState.get("stats");
+    var archivedIdeas = IRSState.get("ideas").filter(function (idea) {
+      return idea.user_status === "dismissed" || idea.user_status === "archived";
+    }).slice(0, 12);
 
     var pipelineCards = sources.map(function (source) {
       var enabled = Number(source.enabled) === 1;
@@ -328,18 +347,27 @@
       : '<p class="view-subtitle">No failures in recent runs.</p>';
 
     var isRunning = IRSState.get("pipelineRunning");
+    var archiveHtml = archivedIdeas.length
+      ? archivedIdeas.map(function (idea) {
+          return IRSComponents.compactCard(idea);
+        }).join("")
+      : IRSComponents.emptyLine("No archived or dismissed ideas yet.");
 
     dom.viewSystem.innerHTML =
       '<header class="view-header">' +
-        '<div class="view-kicker">Health</div>' +
-        '<h1 class="view-title">System</h1>' +
-        '<p class="view-subtitle">Pipeline health and ingestion behavior.</p>' +
+        '<div class="view-kicker">Archive / ops</div>' +
+        '<h1 class="view-title">Archive</h1>' +
+        '<p class="view-subtitle">Dismissed signals, stale entries, and the pipeline gauges behind them.</p>' +
       '</header>' +
       IRSComponents.viewActions([
         { id: "run-pipeline", label: "Run pipeline", variant: "is-primary" },
         { id: "refresh", label: "Refresh" },
         { id: "open-settings", label: "Settings" }
       ]) +
+      '<section class="inspect-section is-visible">' +
+        '<h3 class="eyebrow-row"><span>quiet stack</span></h3>' +
+        '<div class="search-results" style="margin-top:14px">' + archiveHtml + '</div>' +
+      '</section>' +
       '<section class="inspect-section is-visible">' +
         '<h3 class="eyebrow-row"><span>PIPELINE CONTROL</span></h3>' +
         '<div style="margin-top:14px;display:flex;align-items:center;gap:12px">' +
@@ -599,7 +627,8 @@
     dom.settingsSheet.innerHTML = IRSComponents.settingsSheet({
       sources: IRSState.get("sources"),
       appearance: IRSState.get("appearance"),
-      reducedMotion: IRSState.get("reducedMotionOverride")
+      reducedMotion: IRSState.get("reducedMotionOverride"),
+      theme: IRSState.get("theme")
     });
     IRSMotion.showSheet(dom.settingsSheet, dom.scrim);
     IRSState.set({ settingsOpen: true });
@@ -689,6 +718,15 @@
         openSettingsSheet();
       });
     }
+
+    $$("[data-theme-option]", dom.settingsSheet).forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        var theme = chip.dataset.themeOption;
+        IRSState.set({ theme: theme });
+        applyTheme(theme);
+        openSettingsSheet();
+      });
+    });
 
     $$("[data-source-toggle]", dom.settingsSheet).forEach(function (toggle) {
       toggle.addEventListener("click", async function () {
@@ -875,13 +913,20 @@
   /* ---- Initialize ---- */
 
   async function initialize() {
+    var savedTheme = null;
+    try { savedTheme = localStorage.getItem("irs-theme"); } catch (e) { /* ignore */ }
+    if (savedTheme === "editorial" || savedTheme === "vectorheart" || savedTheme === "vectorpunk") {
+      IRSState.set({ theme: savedTheme });
+    }
+    applyTheme(IRSState.get("theme"));
+
     bindNavigation();
     bindGlobalInteractions();
     IRSMotion.onReducedMotionChange(function () { /* no-op, CSS handles it */ });
 
     dom.viewRadar.innerHTML =
       '<header class="view-header">' +
-        '<h1 class="view-title">Radar</h1>' +
+        '<h1 class="view-title">Signal field</h1>' +
         '<p class="view-subtitle">Loading opportunities\u2026</p>' +
       '</header>' +
       '<div class="radar-feed">' +
@@ -898,8 +943,8 @@
       IRSState.set({ loading: false, error: error.message });
       dom.viewRadar.innerHTML =
         '<header class="view-header">' +
-          '<div class="view-kicker">Daily snapshot</div>' +
-          '<h1 class="view-title">Radar</h1>' +
+          '<div class="view-kicker">Vectorheart field unit</div>' +
+          '<h1 class="view-title">Signal field</h1>' +
           '<p class="view-subtitle">The pipeline didn\u2019t answer this time.</p>' +
         '</header>' +
         IRSComponents.emptyState("Couldn\u2019t reach the pipeline.", "Check the backend, then pull to refresh again.");
