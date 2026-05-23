@@ -74,10 +74,11 @@ def run_pipeline(logger) -> int:
     now_iso = utc_now_iso()
 
     try:
+        dedup_cutoff = (now - timedelta(days=config.DEDUP_WINDOW_DAYS)).isoformat()
         with storage.get_connection(str(config.DB_PATH)) as conn:
             last_run = storage.fetch_last_run_log(conn)
             active_ideas = storage.fetch_active_ideas(conn)
-            seen_hashes = set(storage.fetch_seen_hashes(conn))
+            seen_hashes = set(storage.fetch_seen_hashes(conn, since=dedup_cutoff))
             source_configs = storage.fetch_source_configs(conn)
 
         prev_top10_ids, prev_scores = extract_prev_top10(last_run)
@@ -288,15 +289,26 @@ def run_pipeline(logger) -> int:
 
         digest_stats = {
             "signals_fetched": len(signals),
+            "signals_deduped": deduped_count,
             "signals_filtered": filtered_count,
             "signals_processed": len(compressed_signals),
+            "new_signals": len(deduped),
             "estimated_cost_usd": estimated_cost,
             "budget_note": budget_note,
         }
 
+        logger.info(
+            "Pipeline stats: fetched=%d deduped=%d new=%d filtered=%d processed=%d",
+            len(signals), deduped_count, len(deduped), filtered_count, len(compressed_signals),
+        )
+
         with storage.get_connection(str(config.DB_PATH)) as conn:
             with conn:
                 storage.insert_seen_hashes(conn, new_hashes, now_iso)
+                cleanup_cutoff = (now - timedelta(days=config.DEDUP_WINDOW_DAYS * 2)).isoformat()
+                cleaned = storage.cleanup_old_seen_hashes(conn, cleanup_cutoff)
+                if cleaned:
+                    logger.info("Cleaned up %d old seen_hashes", cleaned)
                 for result in source_results:
                     if result.error == "disabled":
                         continue

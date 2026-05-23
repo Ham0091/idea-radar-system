@@ -62,9 +62,11 @@ def format_digest(
         lines.append(format_sources(sources))
         lines.append("")
 
+    deduped = run_stats.get("signals_deduped", 0)
+    new_signals = run_stats.get("new_signals", 0)
     lines.append(
-        "Run: {signals_fetched} fetched, {signals_filtered} filtered, {signals_processed} processed. ${estimated_cost_usd:.3f}.".format(
-            **run_stats
+        "Run: {signals_fetched} fetched, {deduped} deduped, {new_signals} new, {signals_processed} processed. ${estimated_cost_usd:.3f}.".format(
+            deduped=deduped, new_signals=new_signals, **run_stats
         )
     )
     budget_note = run_stats.get("budget_note")

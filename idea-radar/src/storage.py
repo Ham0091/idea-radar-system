@@ -189,9 +189,20 @@ def fetch_signals_for_idea(conn: sqlite3.Connection, idea_id: str, limit: int = 
     return [dict(row) for row in rows]
 
 
-def fetch_seen_hashes(conn: sqlite3.Connection) -> List[str]:
-    rows = conn.execute("SELECT hash FROM seen_hashes").fetchall()
+def fetch_seen_hashes(conn: sqlite3.Connection, since: Optional[str] = None) -> List[str]:
+    if since:
+        rows = conn.execute(
+            "SELECT hash FROM seen_hashes WHERE first_seen >= ?", (since,)
+        ).fetchall()
+    else:
+        rows = conn.execute("SELECT hash FROM seen_hashes").fetchall()
     return [row["hash"] for row in rows]
+
+
+def cleanup_old_seen_hashes(conn: sqlite3.Connection, before: str) -> int:
+    """Delete seen_hashes older than `before` timestamp. Returns count deleted."""
+    cur = conn.execute("DELETE FROM seen_hashes WHERE first_seen < ?", (before,))
+    return cur.rowcount
 
 
 def insert_seen_hashes(conn: sqlite3.Connection, hashes: Iterable[str], timestamp: str) -> None:
